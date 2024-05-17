@@ -75,12 +75,6 @@
     <Compile Include="ToolBox.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WiiUInjector.Domain\WiiUInjector.csproj">
-      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
-      <Name>WiiUInjector</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="images\styles\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -212,8 +206,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\WiiUInjector\WiiUInjector.csproj">
+      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
+      <Name>WiiUInjector</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
     <None Include="fonts\logo.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

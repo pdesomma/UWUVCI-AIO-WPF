@@ -5,14 +5,14 @@ using System.Windows;
 using UWUVCI_AIO_WPF.UI.Windows;
 using UWUVCI_AIO_WPF.ViewModels;
 using WiiUInjector.GitTools.Services;
-using WiiUInjector.Repos.Concrete;
+using WiiUInjector.Repos;
 using WiiUInjector.ViewModels;
 
 namespace UWUVCI_AIO_WPF
 {
     public partial class App : Application
     {
-        private static readonly IEnvironmentService s_environmentService = new EnvironmentService();
+        private static readonly IEnvironmentService s_environmentService = new EnvironmentService("skip", "debug", "spacebypass");
         public static MainViewModel MainViewModel { get; private set; }
 
         readonly Timer t = new Timer(5000);
@@ -33,7 +33,7 @@ namespace UWUVCI_AIO_WPF
                     s_environmentService,
                     new PageNavigationService(),
                     new CommonKeyService(),
-                    new BaseRomService(new BaseRomRepo()),
+                    new BaseRomService(new BaseRomRepo("https://github.com/Hotbrawl20/UWUVCI-VCB/raw/master/", "bases.")),
                     new MetadataService(),
                     new InjectionService(),
                     new PreviewImageDialogService(),
@@ -44,8 +44,8 @@ namespace UWUVCI_AIO_WPF
                     new ExceptionViewModel(new ExceptionDialogService()));
                 MainWindow wnd = new MainWindow();
 
-                double height = System.Windows.SystemParameters.PrimaryScreenHeight;
-                double width = System.Windows.SystemParameters.PrimaryScreenWidth;
+                double height = SystemParameters.PrimaryScreenHeight;
+                double width = SystemParameters.PrimaryScreenWidth;
 
                 if (width < 1150 || height < 700)
                 {
@@ -69,7 +69,8 @@ namespace UWUVCI_AIO_WPF
 
         private void KillProg(object sender, ElapsedEventArgs e)
         {
-            t.Stop();
+            t?.Stop();
+            t?.Dispose();
             Environment.Exit(1);
         }
     }

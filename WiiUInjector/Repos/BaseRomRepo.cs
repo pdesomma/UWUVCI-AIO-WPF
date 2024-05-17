@@ -8,21 +8,40 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Threading.Tasks;
-using WiiUInjector;
-using WiiUInjector.Repos;
 using WiiUInjector.Exceptions;
 
-namespace WiiUInjector.Repos.Concrete
+namespace WiiUInjector.Repos
 {
-    public sealed class BaseRomRepo : IBaseRomDefinitionRepo
+    public sealed class BaseRomRepo : IBaseRomRepo
     {
         private static readonly string s_directory = Path.Combine(Directory.GetCurrentDirectory(), "basedefs");
         private static readonly string s_directory_remote = Path.Combine(s_directory, "remote");
-        private static readonly string s_downloadLink = $@"https://github.com/Hotbrawl20/UWUVCI-VCB/raw/master/bases.";
 
         private readonly Dictionary<GameConsole, Dictionary<string, BaseRom>> _definitionLookup = new Dictionary<GameConsole, Dictionary<string, BaseRom>>();
+        private readonly string _downloadLink;        
 
-        public BaseRomRepo() { }
+        /// <summary>
+        /// Creates a new instance of the <see cref="BaseRomRepo"/> class.
+        /// </summary>
+        /// <param name="baseUrl"></param>
+        /// <param name="filePrefix"></param>
+        public BaseRomRepo(string baseUrl, string filePrefix) 
+        {
+            _downloadLink =  Path.Combine(baseUrl, filePrefix);
+            if (_downloadLink.Length <= 0) throw new ArgumentException(nameof(baseUrl) + " and " + nameof(filePrefix) + " are invalid.");
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="BaseRomRepo"/> class.
+        /// </summary>
+        /// <param name="baseUrl"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public BaseRomRepo(string baseUrl)
+        {
+            _downloadLink = baseUrl;
+            if (_downloadLink.Length <= 0) throw new ArgumentException(nameof(baseUrl));
+            if (_downloadLink[_downloadLink.Length - 1] != '/') _downloadLink += '/';
+        }
 
         /// <summary>
         /// Get all <see cref="BaseRom"/>s for a <see cref="GameConsole"/>.
@@ -73,8 +92,8 @@ namespace WiiUInjector.Repos.Concrete
         /// <returns></returns>
         public async Task UpdateAsync(BaseRom rom)
         {
-            if (!_definitionLookup.TryGetValue(rom.Console, out var dict)) throw new BaseRomException("Not a valid console: " + rom.Console.ToString());
-            if (!dict.TryGetValue(rom.TitleId, out var _)) throw new BaseRomException("Not a valid TitleId: " + rom.TitleId);
+            if (!_definitionLookup.TryGetValue(rom.Console, out var dict)) throw new BaseRomException(rom, "Not a valid console: " + rom.Console.ToString());
+            if (!dict.TryGetValue(rom.TitleId, out var _)) throw new BaseRomException(rom, "Not a valid TitleId: " + rom.TitleId);
 
             dict[rom.TitleId] = rom;
             await WriteToFileAsync(dict.Values, rom.Console);
@@ -90,7 +109,7 @@ namespace WiiUInjector.Repos.Concrete
             Directory.CreateDirectory(s_directory_remote);
             using (var client = new WebClient())
             {
-                await client.DownloadFileTaskAsync(new Uri(s_downloadLink + "vcb" + consoleName), GetDownloadedFile(console));
+                await client.DownloadFileTaskAsync(new Uri(_downloadLink + "vcb" + consoleName), GetDownloadedFile(console));
             }
         }
 

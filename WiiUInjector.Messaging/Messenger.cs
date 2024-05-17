@@ -14,7 +14,6 @@ namespace WiiUInjector.Messaging
         /// Register an object for notifications of a certain type.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="subscriber"></param>
         /// <param name="handler"></param>
         public static void Register<T>(Action<T> handler)
         {

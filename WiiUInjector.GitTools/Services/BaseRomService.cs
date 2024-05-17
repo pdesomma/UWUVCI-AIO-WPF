@@ -12,12 +12,12 @@ namespace WiiUInjector.GitTools.Services
         private static readonly string s_temp = Path.Combine(s_directory, "temp");
         private readonly ITool _romDownloadTool = ToolBox.Tools.RomDownloaderTool;
         private readonly ITool _decryptTool = ToolBox.Tools.DecryptTool;
-        private readonly IBaseRomDefinitionRepo _repo;      
+        private readonly IBaseRomRepo _repo;      
 
         /// <summary>
         /// Creates a new instance of the <see cref="BaseRomService"/> class.
         /// </summary>
-        public BaseRomService(IBaseRomDefinitionRepo repo)
+        public BaseRomService(IBaseRomRepo repo)
         {
             _repo = repo;
             if (!Directory.Exists(s_directory)) Directory.CreateDirectory(s_directory);

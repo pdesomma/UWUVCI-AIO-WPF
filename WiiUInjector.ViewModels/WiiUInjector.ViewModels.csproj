@@ -94,14 +94,17 @@
     <Compile Include="ViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WiiUInjector.Domain\WiiUInjector.csproj">
-      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
-      <Name>WiiUInjector</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WiiUInjector.Messaging\WiiUInjector.Messaging.csproj">
       <Project>{26d6dc66-410c-423b-b564-449b343b9531}</Project>
       <Name>WiiUInjector.Messaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WiiUInjector\WiiUInjector.csproj">
+      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
+      <Name>WiiUInjector</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

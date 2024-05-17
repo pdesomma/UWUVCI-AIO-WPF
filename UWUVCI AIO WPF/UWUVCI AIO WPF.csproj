@@ -535,10 +535,6 @@
     <Resource Include="UI\Images\question_block.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WiiUInjector.Domain\WiiUInjector.csproj">
-      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
-      <Name>WiiUInjector</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WiiUInjector.GitTools\WiiUInjector.GitTools.csproj">
       <Project>{a7f41c11-f471-47b4-8dbf-7cd56e992d39}</Project>
       <Name>WiiUInjector.GitTools</Name>
@@ -547,13 +543,13 @@
       <Project>{26d6dc66-410c-423b-b564-449b343b9531}</Project>
       <Name>WiiUInjector.Messaging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WiiUInjector.Repos.Concrete\WiiUInjector.Repos.Concrete.csproj">
-      <Project>{8ac3642f-6459-43b0-8dce-0a1bbfb6f20b}</Project>
-      <Name>WiiUInjector.Repos.Concrete</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WiiUInjector.ViewModels\WiiUInjector.ViewModels.csproj">
       <Project>{06726ad9-6664-4d63-86a0-bd2b26314b37}</Project>
       <Name>WiiUInjector.ViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WiiUInjector\WiiUInjector.csproj">
+      <Project>{10de8c1b-7b5d-4936-b9d3-2865b0f01bd1}</Project>
+      <Name>WiiUInjector</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

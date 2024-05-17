@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace WiiUInjector.Repos
 {
-    public interface IBaseRomDefinitionRepo
+    public interface IBaseRomRepo
     {
         /// <summary>
         /// Gets all <see cref="BaseRom"/>s for a console.
