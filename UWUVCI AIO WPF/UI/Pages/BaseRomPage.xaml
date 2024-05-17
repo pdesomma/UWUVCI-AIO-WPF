@@ -1,0 +1,190 @@
+﻿<UserControl x:Class="UWUVCI_AIO_WPF.UI.Pages.BaseRomPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:converters="clr-namespace:UWUVCI_AIO_WPF.UI.Converters" 
+      xmlns:controls="clr-namespace:UWUVCI_AIO_WPF.UI.Controls"
+      TextBlock.Foreground="#484848"
+      TextBlock.FontFamily="{DynamicResource Font}"
+      mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:NullHiddenConverter x:Key="NullHiddenConverter" />
+        <converters:NullVisibileConverter x:Key="NullVisibleConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanVisibilityConverter" />
+        <converters:BooleanHiddenConverter x:Key="BooleanHiddenConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        
+        <controls:Waiting 
+            VerticalAlignment="Center" HorizontalAlignment="Center"
+            Visibility="{Binding Path=GameBases, Converter={StaticResource NullVisibleConverter}}" Height="200" Width="100" />
+
+        
+        <Grid Visibility="{Binding Converter={StaticResource NullHiddenConverter}}">
+            <Grid Visibility="{Binding Path=GameBases, Converter={StaticResource NullHiddenConverter}}" >
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" MinWidth="300" MaxWidth="480"/>
+                        <ColumnDefinition Width="2.5*" MinWidth="700"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="{DynamicResource ControlBackgroundBrush}" TextBlock.Foreground="{DynamicResource LoudContentForegroundBrush}">
+                        <Grid>
+                            <Border Margin="20" Padding="25" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{DynamicResource LoudContentBackgroundBrush}"  >
+                                <Grid>
+                                    <StackPanel>
+                                        <TextBlock Text="Base Rom" FontSize="40" />
+                                        <TextBlock Margin="3,5,0,0" Text="Select the rom to use as the base for your injecton." FontSize="16" TextWrapping="Wrap"/>
+                                        <TextBlock Margin="3,10,0,0" Text="Roms require valid Title Keys to be used." FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <GridSplitter BorderBrush="{DynamicResource ControlBackgroundBrush}" BorderThickness="2" Margin="0" Background="White" VerticalAlignment="Stretch" Grid.Column="0" HorizontalAlignment="Right" Width="5"></GridSplitter>
+
+
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="350"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions >
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <ListView
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{Binding GameBases}"
+                                    Style="{DynamicResource ListViewStyle}"     
+                                    SelectedItem="{Binding SelectedGameBase}" >
+                                <ListView.ItemTemplate>
+                                    <DataTemplate >
+                                        <Grid Margin="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="35"/>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="30" />
+                                            </Grid.ColumnDefinitions>
+                                            <Image Style="{DynamicResource RegionImageStyle}" Grid.Column="0" />
+                                            <TextBlock VerticalAlignment="Center" Grid.Column="1" Margin="10" Text="{Binding Path=Name}"></TextBlock>
+                                            <Image Grid.Column="2" HorizontalAlignment="Center" Margin="5" Source="pack://application:,,,/UI/Images/icon-check.png" 
+                                                    Visibility="{Binding IsKeyValid, Converter={StaticResource BooleanVisibilityConverter}}"
+                                                    ToolTip="Title key verified!"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+
+                        <Grid
+                            HorizontalAlignment="Stretch"
+                            TextBlock.Foreground="{DynamicResource ContentForegroundBrush}"
+                            TextBlock.FontFamily="{DynamicResource Font}"
+                            TextBlock.FontSize="14"
+                            Grid.Column="1" >
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="1">
+                                <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" >
+                                    <Button 
+                                        Style="{DynamicResource CustomButtonStyle}" Width="80" Height="40"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Back" 
+                                        Command="{Binding BackCommand}" Margin="0,0,5,0"/>
+                                    <Button 
+                                        Style="{DynamicResource CustomButtonStyle}" Width="80" Height="40"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Next" 
+                                        Command="{Binding ConfirmBaseCommand}"
+                                        Visibility="{Binding SelectedGameBase.TitleKey, Converter={StaticResource NullHiddenConverter}}"/>
+                                </WrapPanel>
+                            </Grid>
+                            <Grid Grid.Row="0"
+                                Visibility="{Binding SelectedGameBase, Converter={StaticResource NullHiddenConverter}}" >
+                                <DockPanel
+                                    LastChildFill="False"
+                                    VerticalAlignment="Stretch" 
+                                    HorizontalAlignment="Stretch" 
+                                    DataContext="{Binding SelectedGameBase}"
+                                    Visibility="{Binding SelectedGameBase, Converter={StaticResource NullHiddenConverter}}"
+                                    Margin="10">
+
+                                    <Grid DockPanel.Dock="Top">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Grid.Column="0" Style="{DynamicResource RegionImageStyle}" Margin="5" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding Name}"/>
+                                    </Grid>
+                                    <Border DockPanel.Dock="Top" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+                                    <Grid DockPanel.Dock="Top">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="35"/>
+                                            <ColumnDefinition Width="75"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image Grid.Column="0" HorizontalAlignment="Center" Margin="5" Source="pack://application:,,,/UI/Images/icon-game.png" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">Title Id</TextBlock>
+                                        <TextBlock Name="txtTitleId" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding TitleId}"/>
+                                        <Image  VerticalAlignment="Center"
+                                                Grid.Column="3"
+                                                HorizontalAlignment="Center"
+                                                Margin="25,0,0,0"
+                                                Height="20"
+                                                Source="pack://application:,,,/UI/Images/copy.png"
+                                                Cursor="Hand"
+                                                ToolTip="Click to copy Title Id to clipboard"
+                                                MouseDown="Copy_MouseDown" />
+                                    </Grid>
+                                    <Border DockPanel.Dock="Top" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+                                    <Grid DockPanel.Dock="Top">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="35"/>
+                                            <ColumnDefinition Width="75"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="30"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image Grid.Column="0" HorizontalAlignment="Center" Margin="5" Source="pack://application:,,,/UI/Images/icon-key.png" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">Title Key</TextBlock>
+                                        <TextBox Grid.Column="2" Grid.ColumnSpan="2" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" 
+                                                 Text="{Binding TitleKey, UpdateSourceTrigger=PropertyChanged}"
+                                                 VerticalContentAlignment="Center"
+                                                 Visibility="{Binding IsKeyValid, Converter={StaticResource BooleanHiddenConverter}}"/>
+                                        <TextBlock Width="300" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                                                     Visibility="{Binding IsKeyValid, Converter={StaticResource BooleanVisibilityConverter}}"
+                                                     Text="{Binding TitleKey}"/>
+                                        <Image Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="7,0,0,0" Source="pack://application:,,,/UI/Images/icon-check.png" 
+                                                Visibility="{Binding IsKeyValid, Converter={StaticResource BooleanVisibilityConverter}}"
+                                                ToolTip="Title key verified!"/>
+                                    </Grid>
+                                </DockPanel>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+
+</UserControl>

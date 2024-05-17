@@ -1,0 +1,54 @@
+﻿<Page x:Class="UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Bases.StandardBaseFrame"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="290" d:DesignWidth="383"
+      x:ClassModifier="internal">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="150"/>
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock 
+            x:Name="tbDWNL"  
+            Grid.Row="0" Grid.Column="0"
+            Text="{Binding Path=DownloadStatus}" 
+            VerticalAlignment="Center"
+            FontSize="20" 
+            Foreground="{Binding Path=DownloadStatusBrush}"/>
+        <TextBlock  
+            x:Name="tbTK" 
+            Grid.Row="1" Grid.Column="0" 
+            Text="{Binding Path=TitleKey}" 
+            VerticalAlignment="Center" 
+            FontSize="20" 
+            Foreground="Black"/>
+
+        <Button 
+            x:Name="btnDwnlnd" 
+            Grid.Row="0" Grid.Column="1"
+            Content="Download" 
+            HorizontalAlignment="Right" 
+            IsTabStop="False" 
+            Width="100"
+            VerticalAlignment="Center"
+            Visibility="{Binding Path=DownloadVisibility}" />
+        <Button 
+            x:Name="TK" 
+            Grid.Row="1" Grid.Column="1" 
+            Content="Enter TKey" 
+            HorizontalAlignment="Right" 
+            IsTabStop="False" 
+            Width="100"
+            VerticalAlignment="Center" 
+            Click="BtnDwnln_Copy_Click"    />
+    </Grid>
+</Page>

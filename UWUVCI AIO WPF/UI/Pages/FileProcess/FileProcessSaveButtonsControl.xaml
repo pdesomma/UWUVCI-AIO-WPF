@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="UWUVCI_AIO_WPF.UI.Controls.FileProcessSaveButtonsControl"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      xmlns:vm="clr-namespace:WiiUInjector.ViewModels;assembly=WiiUInjector.ViewModels"
+      d:DesignHeight="400" d:DesignWidth="750"
+      d:DataContext="{d:DesignInstance Type=vm:FileProcessingViewModel}">
+    
+    <WrapPanel >
+        <Button Content="Cancel"  
+                Style="{DynamicResource CustomButtonStyle}"
+                Command="{Binding CancelCommand}"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom"
+                Height="40" Width="70">
+        </Button>
+
+        <Button Content="Ok"
+            Style="{DynamicResource CustomButtonStyle}"
+            HorizontalAlignment="Right" 
+            Margin="10,0,0,0"
+            Command="{Binding SaveProcessedFileCommand}" 
+            VerticalAlignment="Bottom"                            
+            Height="40" Width="70">
+        </Button>
+    </WrapPanel>
+</UserControl>

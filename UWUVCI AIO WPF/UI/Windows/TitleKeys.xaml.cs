@@ -5,18 +5,15 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using UWUVCI_AIO_WPF.ViewModels;
 
 namespace UWUVCI_AIO_WPF.UI.Windows
 {
-    /// <summary>
-    /// Interaktionslogik für TitleKeys.xaml
-    /// </summary>
     public partial class TitleKeys : Window
     {
-        string url = "";
         public TitleKeys(string url)
         {
-            MainViewModel mvm = FindResource("mvm") as MainViewModel;
+            MainViewModel mvm = DataContext as MainViewModel;
             try
             {
                 if (Owner?.GetType() != typeof(MainWindow))
@@ -29,37 +26,12 @@ namespace UWUVCI_AIO_WPF.UI.Windows
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
             string fullurl = "";
-            try
-            {
-                fullurl = mvm.GetURL(url);
-                if (fullurl == "" || fullurl == null)
-                {
-                    throw new Exception();
-                }
-            }
-            catch (Exception)
-            {
-                Custom_Message cm = new Custom_Message("Not Implemented", $"The Helppage for {url.ToUpper()} is not implemented yet");
-                try
-                {
-                    cm.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-                    // left empty on purpose
-                }
-                cm.ShowDialog();
-                Close();
-                mvm.mw.Show();
-            }
-            
+
             wb.Source = new Uri(fullurl, UriKind.Absolute);
             wb.Refresh(true);
 
             clsWebbrowser_Errors.SuppressscriptErrors(wb, true);
             InitializeComponent();
-
-            this.url = url;
         }
         public TitleKeys(string url, string title)
         {
@@ -68,7 +40,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
             Thread t = new Thread(() => DoStuff(url));
             t.SetApartmentState(ApartmentState.STA);
             t.Start();
-            tbTitleBar.Text = title.Replace(" Inject "," ");
+            tbTitleBar.Text = title.Replace(" Inject ", " ");
         }
         private void MoveWindow(object sender, MouseButtonEventArgs e)
         {
@@ -78,12 +50,12 @@ namespace UWUVCI_AIO_WPF.UI.Windows
                 {
                     Owner.PointToScreen(new Point(Left, Top));
                     DragMove();
-                   // this.Owner.PointFromScreen(new Point(this.Left, this.Top));
+                    // this.Owner.PointFromScreen(new Point(this.Left, this.Top));
                     //(FindResource("mvm") as MainViewModel).mw.PointFromScreen(new Point(this.Left, this.Top));
                 }
-                   
+
                 //PointFromScreen(new Point(this.Left, this.Top));
-               
+
             }
             catch (Exception)
             {
@@ -93,49 +65,19 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
         public void DoStuff(string url)
         {
-            MainViewModel mvm = FindResource("mvm") as MainViewModel;
+            MainViewModel mvm = DataContext as MainViewModel;
             string fullurl = "";
-            try
-            {
-                fullurl = mvm.GetURL(url);
-                if (string.IsNullOrEmpty(fullurl))
-                {
-                    throw new Exception();
-                }
-            }
-            catch (Exception)
-            {
-                Custom_Message cm = new Custom_Message("Not Implemented", $"The Helppage for {url.ToUpper()} is not implemented yet");
-                try
-                {
-                    cm.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-                    // left empty on purpose
-                }
-                cm.Show();
-                Close();
-                mvm.mw.Show();
-            }
 
             Dispatcher.Invoke(() =>
             {
                 wb.Source = new Uri(fullurl, UriKind.Absolute);
                 clsWebbrowser_Errors.SuppressscriptErrors(wb, true);
             });
-            
-            /*dynamic activeX = this.wb.GetType().InvokeMember("ActiveXInstance",
-                    BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
-                    null, this.wb, new object[] { });
-
-            activeX.Silent = true;*/
-           
         }
 
         private void Window_Close(object sender, RoutedEventArgs e)
         {
-            Owner.Left =Left;
+            Owner.Left = Left;
             Owner.Top = Top;
             Owner.Show();
             Close();
@@ -153,7 +95,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
         }
 
 
-      
+
         private void wb_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
             if (!e.Uri.ToString().Contains("UWUVCI-PRIME"))
@@ -167,18 +109,8 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
                 Process.Start(startInfo);
             }
-            
+
             // cancel navigation to the clicked link in the webBrowser control
-        }
-
-        private void wind_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            (FindResource("mvm") as MainViewModel).mw.Topmost = true;
-        }
-
-        private void wind_Closed(object sender, EventArgs e)
-        {
-            (FindResource("mvm") as MainViewModel).mw.Topmost = false;
         }
     }
     public static class clsWebbrowser_Errors

@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using WiiUInjector;
 using UWUVCI_AIO_WPF.Properties;
 using UWUVCI_AIO_WPF.UI.Windows;
+using UWUVCI_AIO_WPF.ViewModels;
 using WiiUDownloaderLibrary;
 
 namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
@@ -27,36 +22,30 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
     /// </summary>
     public partial class WiiConfig : Page, IDisposable
     {
-        MainViewModel mvm;
-        bool dont = true;
-        public void clearImages(int i)
+        readonly MainViewModel mvm;
+        public void ClearImages(int i)
         {
-
             switch (i)
             {
                 case 0:
                     icoIMG.Visibility = Visibility.Hidden;
-                    mvm.GameConfiguration.TGAIco = new Classes.PNGTGA();
                     ic.Text = null;
                     break;
                 case 1:
                     tvIMG.Visibility = Visibility.Hidden;
-                    mvm.GameConfiguration.TGATv = new Classes.PNGTGA();
                     tv.Text = null;
                     break;
                 case 2:
                     drcIMG.Visibility = Visibility.Hidden;
-                    mvm.GameConfiguration.TGADrc = new Classes.PNGTGA();
                     drc.Text = null;
                     break;
                 case 3:
                     logIMG.Visibility = Visibility.Hidden;
-                    mvm.GameConfiguration.TGALog = new Classes.PNGTGA();
                     log.Text = null;
                     break;
             }
         }
-        public void imgpath(string icon, string tv)
+        public void Imgpath(string icon, string tv)
         {
             ic.Text = icon;
             this.tv.Text = tv;
@@ -64,48 +53,56 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
         public WiiConfig()
         {
             InitializeComponent();
-            mvm = FindResource("mvm") as MainViewModel;
-            mvm.setThing(this);
+            mvm = DataContext as MainViewModel;
+            mvm.SetThing(this);
             Injection.ToolTip = "Changing the extension of a ROM may result in a faulty inject.\nWe will not give any support in such cases";
-            List<string> gpEmu = new List<string>();
-            gpEmu.Add("Do not use. WiiMotes only");
-            gpEmu.Add("Classic Controller");
-            gpEmu.Add("Horizontal WiiMote");
-            gpEmu.Add("Vertical WiiMote");
-            gpEmu.Add("Force Classic Controller");
-            gpEmu.Add("Force No Classic Controller");
+            List<string> gpEmu = new List<string>
+            {
+                "Do not use. WiiMotes only",
+                "Classic Controller",
+                "Horizontal WiiMote",
+                "Vertical WiiMote",
+                "Force Classic Controller",
+                "Force No Classic Controller"
+            };
             gamepad.ItemsSource = gpEmu;
             gamepad.SelectedIndex = 0;
-            mvm.test = GameBaseClassLibrary.GameConsoles.WII;
-            List<string> selection = new List<string>();
-            selection.Add("Video Patches");
-            selection.Add("Region Patches");
-            selection.Add("Extras");
+            mvm.test = GameConsole.WII;
+            List<string> selection = new List<string>
+            {
+                "Video Patches",
+                "Region Patches",
+                "Extras"
+            };
             selectionDB.ItemsSource = selection;
             selectionDB.SelectedIndex = 0;
         }
         public WiiConfig(GameConfig c)
         {
             InitializeComponent();
-            mvm = FindResource("mvm") as MainViewModel;
-            getInfoFromConfig();
+            mvm = DataContext as MainViewModel;
+            GetInfoFromConfig();
             mvm.GameConfiguration = c.Clone();
-            mvm.setThing(this);
+            mvm.SetThing(this);
             Injection.ToolTip = "Changing the extension of a ROM may result in a faulty inject.\nWe will not give any support in such cases";
-            List<string> gpEmu = new List<string>();
-            gpEmu.Add("Do not use. WiiMotes only");
-            gpEmu.Add("Classic Controller");
-            gpEmu.Add("Horizontal WiiMote");
-            gpEmu.Add("Vertical WiiMote");
-            gpEmu.Add("Force Classic Controller");
-            gpEmu.Add("Force No Classic Controller");
+            List<string> gpEmu = new List<string>
+            {
+                "Do not use. WiiMotes only",
+                "Classic Controller",
+                "Horizontal WiiMote",
+                "Vertical WiiMote",
+                "Force Classic Controller",
+                "Force No Classic Controller"
+            };
             gamepad.ItemsSource = gpEmu;
             gamepad.SelectedIndex = 0;
-            mvm.test = GameBaseClassLibrary.GameConsoles.WII;
-            List<string> selection = new List<string>();
-            selection.Add("Video Patches");
-            selection.Add("Region Patches");
-            selection.Add("Extras");
+            mvm.test = GameConsole.WII;
+            List<string> selection = new List<string>
+            {
+                "Video Patches",
+                "Region Patches",
+                "Extras"
+            };
             selectionDB.ItemsSource = selection;
             selectionDB.SelectedIndex = 0;
         }
@@ -114,7 +111,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
         }
 
-        private void Set_Rom_Path(object sender, RoutedEventArgs e)
+        private async void Set_Rom_Path(object sender, RoutedEventArgs e)
         {
             string path = mvm.GetFilePath(true, false);
             ancast_Button.IsEnabled = false;
@@ -123,7 +120,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             if (!CheckIfNull(path))
 
             {
-                int TitleIDInt = 0;
+                int TitleIDInt;
                 bool isok = false;
                 if (path.ToLower().Contains(".gcz") || path.ToLower().Contains(".dol") || path.ToLower().Contains(".wad"))
                 {
@@ -151,8 +148,8 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         reader.Close();
                     }
                 }
-                
-                
+
+
                 if (isok)
                 {
                     motepass.IsEnabled = false;
@@ -167,39 +164,29 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                     mvm.donttrim = false;
                     jppatch.IsEnabled = true;
                     motepass.IsEnabled = false;
-                    List<string> gpEmu = new List<string>();
-                    gpEmu.Add("Do not use. WiiMotes only");
-                    gpEmu.Add("Classic Controller");
-                    gpEmu.Add("Horizontal WiiMote");
-                    gpEmu.Add("Vertical WiiMote");
-                    gpEmu.Add("Force Classic Controller");
-                    gpEmu.Add("Force No Classic Controller");
+                    List<string> gpEmu = new List<string>
+                    {
+                        "Do not use. WiiMotes only",
+                        "Classic Controller",
+                        "Horizontal WiiMote",
+                        "Vertical WiiMote",
+                        "Force Classic Controller",
+                        "Force No Classic Controller"
+                    };
                     gamepad.ItemsSource = gpEmu;
                     gamepad.ItemsSource = gpEmu;
                     mvm.RomPath = path;
                     mvm.RomSet = true;
-                    if (mvm.BaseDownloaded)
-                    {
-                        mvm.CanInject = true;
 
-                    }
                     if (!path.ToLower().Contains(".gcz") && !path.ToLower().Contains(".dol") && !path.ToLower().Contains(".wad"))
                     {
-                        string rom = mvm.getInternalWIIGCNName(mvm.RomPath, false);
+                        string rom = await mvm.GetInternalWIIGCNName(mvm.RomPath, false);
                         Regex reg = new Regex("[*'\",_&#^@:;?!<>|µ~#°²³´`éⓇ©™]");
                         gn.Text = reg.Replace(rom, string.Empty);
                         mvm.GameConfiguration.GameName = reg.Replace(rom, string.Empty);
-                        if (mvm.GameConfiguration.TGAIco.ImgPath != "" || mvm.GameConfiguration.TGAIco.ImgPath != null)
-                        {
-                            ic.Text = mvm.GameConfiguration.TGAIco.ImgPath;
-                        }
-                        if (mvm.GameConfiguration.TGATv.ImgPath != "" || mvm.GameConfiguration.TGATv.ImgPath != null)
-                        {
-                            tv.Text = mvm.GameConfiguration.TGATv.ImgPath;
-                        }
-                        if (path.ToLower().Contains("iso"))
-                        {
 
+                        if (System.IO.Path.GetExtension(path).ToLower() == "iso")
+                        {
                             trimn.IsEnabled = true;
                             mvm.IsIsoNkit();
                         }
@@ -224,7 +211,8 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         mvm.donttrim = false;
                         gamepad.IsEnabled = false;
                         LR.IsEnabled = false;
-                    }else if (path.ToLower().Contains(".wad"))
+                    }
+                    else if (path.ToLower().Contains(".wad"))
                     {
                         mvm.NKITFLAG = false;
                         trimn.IsEnabled = false;
@@ -238,7 +226,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         RF_tp.IsEnabled = false;
                         jppatch.IsEnabled = false;
                         mvm.donttrim = false;
-                       
+
                     }
                     else
                     {
@@ -247,20 +235,12 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
                         trimn.IsEnabled = true;
                     }
-                       
-                   
+
+
                 }
                 else
                 {
                     Custom_Message cm = new Custom_Message("Wrong ROM", "The chosen ROM is not a supported WII Game");
-                    try
-                    {
-                        cm.Owner = mvm.mw;
-                    }
-                    catch (Exception)
-                    {
-
-                    }
                     cm.ShowDialog();
                 }
             }
@@ -291,39 +271,6 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
         private void InjectGame(object sender, RoutedEventArgs e)
         {
-            if (File.Exists(tv.Text))
-            {
-                mvm.GameConfiguration.TGATv.ImgPath = tv.Text;
-            }
-            else if (!tv.Text.Equals("Added via Config") && !tv.Text.Equals("Downloaded from Cucholix Repo"))
-            {
-                mvm.GameConfiguration.TGATv.ImgPath = null;
-            }
-            if (File.Exists(ic.Text))
-            {
-                mvm.GameConfiguration.TGAIco.ImgPath = ic.Text;
-            }
-            else if (!ic.Text.Equals("Added via Config") && !ic.Text.Equals("Downloaded from Cucholix Repo"))
-            {
-                mvm.GameConfiguration.TGAIco.ImgPath = null;
-
-            }
-            if (File.Exists(log.Text))
-            {
-                mvm.GameConfiguration.TGALog.ImgPath = log.Text;
-            }
-            else if (!log.Text.Equals("Added via Config") && !log.Text.Equals("Downloaded from Cucholix Repo"))
-            {
-                mvm.GameConfiguration.TGALog.ImgPath = null;
-            }
-            if (File.Exists(drc.Text))
-            {
-                mvm.GameConfiguration.TGADrc.ImgPath = drc.Text;
-            }
-            else if (!drc.Text.Equals("Added via Config") && !drc.Text.Equals("Downloaded from Cucholix Repo"))
-            {
-                mvm.GameConfiguration.TGADrc.ImgPath = null;
-            }
             mvm.Index = gamepad.SelectedIndex;
             if (LR.IsChecked == true)
             {
@@ -359,8 +306,6 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
                     Task.Run(() =>
                     {
-                        mvm.Progress += 5;
-
                         Directory.CreateDirectory(tempPath + "\\C2W");
 
                         var titleIds = new List<string>()
@@ -372,13 +317,11 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         foreach (var titleId in titleIds)
                         {
                             Task.Run(() => Downloader.DownloadAsync(titleId, downloadPath)).GetAwaiter().GetResult();
-                            mvm.Progress += 5;
                         }
 
                         foreach (var titleId in titleIds)
                         {
                             CSharpDecrypt.CSharpDecrypt.Decrypt(new string[] { Settings.Default.Ckey, System.IO.Path.Combine(downloadPath, titleId), c2wPath });
-                            mvm.Progress += 5;
                         }
 
                         File.WriteAllLines(c2wPath + "\\starbuck_key.txt", ancastKeyCopy);
@@ -386,8 +329,6 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         File.Copy(System.IO.Path.Combine(toolsPath, "c2w_patcher.exe"), c2wFile, true);
 
                         File.Copy(imgFileCode, imgFile, true);
-
-                        mvm.Progress += 5;
 
                         var currentDir = Directory.GetCurrentDirectory();
                         Directory.SetCurrentDirectory(c2wPath);
@@ -401,7 +342,6 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                         Directory.SetCurrentDirectory(currentDir);
 
                         File.Copy(System.IO.Path.Combine(c2wPath, "c2p.img"), imgFileCode, true);
-                        mvm.Progress = 100;
                     }).GetAwaiter();
                 }
                 else
@@ -411,14 +351,8 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                     return;
                 }
 
-                var message = new DownloadWait("Setting Up C2W - Please Wait", "", mvm);
-                try
-                {
-                    message.changeOwner(mvm.mw);
-                }
-                catch (Exception) { }
+                var message = new DownloadWait("Setting Up C2W - Please Wait", mvm);
                 message.ShowDialog();
-                mvm.Progress = 0;
                 File.Delete(imgFileCode);
                 try
                 {
@@ -436,131 +370,27 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 catch { }
             }
 
-            mvm.Inject(false);
+            //mvm.Inject(false);
         }
 
-        private void Set_TvTex(object sender, RoutedEventArgs e)
-        {
-            string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "bin", "createdIMG", "bootTvTex.png");
-            using (ImageCreator ic = new ImageCreator(mvm.GameConfiguration.Console, "bootTvTex"))
-            {
-                try
-                {
-                    ic.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-
-                }
-                ic.ShowDialog();
-            }
-
-            if (File.Exists(path) && mvm.CheckTime(new FileInfo(path).CreationTime))
-            {
-                mvm.GameConfiguration.TGATv.ImgPath = path;
-                mvm.GameConfiguration.TGATv.extension = new FileInfo(path).Extension;
-                tv.Text = path;
-                tvIMG.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void Set_DrcTex(object sender, RoutedEventArgs e)
-        {
-            string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "bin", "createdIMG", "bootDrcTex.png");
-            using (ImageCreator ic = new ImageCreator(mvm.GameConfiguration.Console, "bootDrcTex"))
-            {
-                try
-                {
-                    ic.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-
-                }
-                ic.ShowDialog();
-            }
-
-            if (File.Exists(path) && mvm.CheckTime(new FileInfo(path).CreationTime))
-            {
-                mvm.GameConfiguration.TGADrc.ImgPath = path;
-                mvm.GameConfiguration.TGADrc.extension = new FileInfo(path).Extension;
-                drc.Text = path;
-                drcIMG.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void Set_IconTex(object sender, RoutedEventArgs e)
-        {
-            string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "bin", "createdIMG", "iconTex.png");
-            using (IconCreator ic = new IconCreator("WII"))
-            {
-                try
-                {
-                    ic.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-
-                }
-                ic.ShowDialog();
-            }
-
-            if (File.Exists(path) && mvm.CheckTime(new FileInfo(path).CreationTime))
-            {
-                mvm.GameConfiguration.TGAIco.ImgPath = path;
-                mvm.GameConfiguration.TGAIco.extension = new FileInfo(path).Extension;
-                this.ic.Text = path;
-                icoIMG.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void Set_LogoTex(object sender, RoutedEventArgs e)
-        {
-            string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "bin", "createdIMG", "bootLogoTex.png");
-            using (LogoCreator ic = new LogoCreator())
-            {
-                try
-                {
-                    ic.Owner = (FindResource("mvm") as MainViewModel).mw;
-                }
-                catch (Exception)
-                {
-
-                }
-                ic.ShowDialog();
-            }
-
-            if (File.Exists(path) && mvm.CheckTime(new FileInfo(path).CreationTime))
-            {
-                mvm.GameConfiguration.TGALog.ImgPath = path;
-                mvm.GameConfiguration.TGALog.extension = new FileInfo(path).Extension;
-                this.log.Text = path;
-                logIMG.Visibility = Visibility.Visible;
-            }
-
-        }
-        public void getInfoFromConfig()
+        public void GetInfoFromConfig()
         {
             rp.Text = "";
             mvm.RomPath = "";
             mvm.RomSet = false;
-            mvm.gc2rom = "";
-            tv.Text = mvm.GameConfiguration.TGATv.ImgPath;
+            mvm.GC2Rom = "";
             if (tv.Text.Length > 0)
             {
                 tvIMG.Visibility = Visibility.Visible;
             }
-            ic.Text = mvm.GameConfiguration.TGAIco.ImgPath;
             if (ic.Text.Length > 0)
             {
                 icoIMG.Visibility = Visibility.Visible;
             }
-            drc.Text = mvm.GameConfiguration.TGADrc.ImgPath;
             if (drc.Text.Length > 0)
             {
                 drcIMG.Visibility = Visibility.Visible;
             }
-            log.Text = mvm.GameConfiguration.TGALog.ImgPath;
             if (log.Text.Length > 0)
             {
                 logIMG.Visibility = Visibility.Visible;
@@ -580,8 +410,6 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 }
                 File.WriteAllBytes($@"bin\cfgBoot\bootSound.{mvm.GameConfiguration.extension}", mvm.GameConfiguration.bootsound);
                 sound.Text = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "bin", "cfgBoot", $"bootSound.{mvm.GameConfiguration.extension}");
-                mvm.BootSound = sound.Text;
-                sound_TextChanged(null, null);
             }
             LR.IsChecked = mvm.LR;
             if (mvm.GameConfiguration.donttrim)
@@ -637,7 +465,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                     RF_n.IsChecked = false;
                     RF_tj.IsChecked = false;
                     RF_tn.IsChecked = false;
-                    RF_tp.IsChecked =true;
+                    RF_tp.IsChecked = true;
                 }
             }
             else
@@ -657,7 +485,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             return false;
         }
 
-        private void gn_KeyUp(object sender, KeyEventArgs e)
+        private void Gn_KeyUp(object sender, KeyEventArgs e)
         {
 
             /*Regex reg = new Regex("[^a-zA-Z0-9 é -]");
@@ -674,12 +502,12 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
         }
 
-        private void gn_KeyUp_1(object sender, KeyEventArgs e)
+        private void Gn_KeyUp_1(object sender, KeyEventArgs e)
         {
 
         }
 
-        private void gamepad_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Gamepad_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             mvm.Index = gamepad.SelectedIndex;
             if (gamepad.SelectedIndex == 1 || gamepad.SelectedIndex == 4)
@@ -710,7 +538,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             mvm.toPal = false;
             mvm.Patch = false;
         }
-        public void reset()
+        public void Reset()
         {
             tv.Text = "";
             drc.Text = "";
@@ -720,64 +548,28 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
 
 
         }
-        private void icoIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            ICOSHOW ics = new ICOSHOW(ic.Text);
-            try
-            {
-                ics.Owner = mvm.mw;
-            }
-            catch (Exception)
-            {
+        private void IcoIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
 
-            }
-            ics.ShowDialog();
-        }
-
-        private void tvIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TvIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TDRSHOW t = new TDRSHOW(tv.Text, false);
-            try
-            {
-                t.Owner = mvm.mw;
-            }
-            catch (Exception)
-            {
-
-            }
             t.ShowDialog();
         }
 
-        private void drcIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void DrcIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            TDRSHOW t = new TDRSHOW(drc.Text,true);
-            try
-            {
-                t.Owner = mvm.mw;
-            }
-            catch (Exception)
-            {
-
-            }
+            TDRSHOW t = new TDRSHOW(drc.Text, true);
             t.ShowDialog();
 
         }
 
-        private void logIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void LogIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LOGSHOW t = new LOGSHOW(log.Text);
-            try
-            {
-                t.Owner = mvm.mw;
-            }
-            catch (Exception)
-            {
-
-            }
             t.ShowDialog();
         }
 
-        private void ic_TextChanged(object sender, TextChangedEventArgs e)
+        private void Ic_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (ic.Text.Length > 0)
             {
@@ -789,7 +581,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void drc_TextChanged(object sender, TextChangedEventArgs e)
+        private void Drc_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (drc.Text.Length > 0)
             {
@@ -802,7 +594,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void tv_TextChanged(object sender, TextChangedEventArgs e)
+        private void Tv_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (tv.Text.Length > 0)
             {
@@ -814,7 +606,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void log_TextChanged(object sender, TextChangedEventArgs e)
+        private void Log_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (log.Text.Length > 0)
             {
@@ -826,11 +618,10 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void gn_KeyDown(object sender, KeyEventArgs e)
+        private void Gn_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.Up) || Keyboard.IsKeyDown(Key.Down) || Keyboard.IsKeyDown(Key.Left) || Keyboard.IsKeyDown(Key.Right))
             {
-                dont = false;
             }
         }
 
@@ -841,109 +632,34 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             {
                 if (new FileInfo(path).Extension.Contains("wav"))
                 {
-                    if (mvm.ConfirmRiffWave(path))
-                    {
-                        mvm.BootSound = path;
-                    }
-                    else
+                    if (!mvm.ConfirmRiffWave(path))
                     {
                         Custom_Message cm = new Custom_Message("Incompatible WAV file", "Your WAV file needs to be a RIFF WAVE file which is 16 bit stereo and also 48000khz");
-                        try
-                        {
-                            cm.Owner = mvm.mw;
-                        }
-                        catch (Exception)
-                        {
-
-                        }
                         cm.ShowDialog();
                     }
                 }
-                else
-                {
-
-                    mvm.BootSound = path;
-                }
-            }
-            else
-            {
-                if (path == "")
-                {
-                    mvm.BootSound = null;
-                    sound.Text = "";
-                   
-                }
             }
         }
 
-        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-           
-        }
+        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
 
-        private void SoundImg_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            mvm.PlaySound();
-        }
-
-        private void sound_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            try
-            {
-                if (File.Exists(mvm.BootSound))
-                {
-                    if (!new FileInfo(mvm.BootSound).Extension.Contains("btsnd"))
-                    {
-                        SoundImg.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        SoundImg.Visibility = Visibility.Hidden;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-            
-            
-        }
-
-        
+        private void SoundImg_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             try
             {
                 TitleKeys webbrowser = new TitleKeys("wii", "Wii Inject Guide");
-                try
-                {
-                    webbrowser.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-
-                }
                 webbrowser.Show();
-                mvm.mw.Hide();
             }
             catch (Exception)
             {
                 Custom_Message cm = new Custom_Message("Not Implemented", "The Helppage for Wii is not implemented yet");
-                try
-                {
-                    cm.Owner = mvm.mw;
-                }
-                catch (Exception)
-                {
-
-                }
                 cm.Show();
             }
         }
 
-        private void trimn_Click(object sender, RoutedEventArgs e)
+        private void Trimn_Click(object sender, RoutedEventArgs e)
         {
             if (!mvm.donttrim)
             {
@@ -956,13 +672,15 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 mvm.donttrim = true;
                 mvm.jppatch = false;
                 int last = gamepad.SelectedIndex;
-                List<string> gpEmu = new List<string>();
-                gpEmu.Add("Do not use. WiiMotes only");
-                gpEmu.Add("Classic Controller");
-                gpEmu.Add("Horizontal WiiMote");
-                gpEmu.Add("Vertical WiiMote");
-                gpEmu.Add("[NEEDS TRIMMING] Force Classic Controller");
-                gpEmu.Add("Force No Classic Controller");
+                List<string> gpEmu = new List<string>
+                {
+                    "Do not use. WiiMotes only",
+                    "Classic Controller",
+                    "Horizontal WiiMote",
+                    "Vertical WiiMote",
+                    "[NEEDS TRIMMING] Force Classic Controller",
+                    "Force No Classic Controller"
+                };
                 gamepad.ItemsSource = gpEmu;
                 gamepad.SelectedIndex = last;
                 jppatch.IsEnabled = false;
@@ -975,21 +693,22 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 ntsc.IsEnabled = true;
                 mvm.donttrim = false;
                 jppatch.IsEnabled = true;
-                List<string> gpEmu = new List<string>();
-                gpEmu.Add("Do not use. WiiMotes only");
-                gpEmu.Add("Classic Controller");
-                gpEmu.Add("Horizontal WiiMote");
-                gpEmu.Add("Vertical WiiMote");
-                gpEmu.Add("Force Classic Controller");
-                gpEmu.Add("Force No Classic Controller");
+                List<string> gpEmu = new List<string>
+                {
+                    "Do not use. WiiMotes only",
+                    "Classic Controller",
+                    "Horizontal WiiMote",
+                    "Vertical WiiMote",
+                    "Force Classic Controller",
+                    "Force No Classic Controller"
+                };
                 gamepad.ItemsSource = gpEmu;
                 gamepad.ItemsSource = gpEmu;
                 gamepad.SelectedIndex = last;
             }
-            
         }
 
-        private void jppatch_Click(object sender, RoutedEventArgs e)
+        private void Jppatch_Click(object sender, RoutedEventArgs e)
         {
             if (mvm.jppatch)
             {
@@ -1001,7 +720,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void selectionDB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SelectionDB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             switch (selectionDB.SelectedIndex)
             {
@@ -1023,15 +742,9 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void motepass_Checked(object sender, RoutedEventArgs e)
-        {
-            mvm.passtrough = false;
-        }
+        private void Motepass_Checked(object sender, RoutedEventArgs e) => mvm.passtrough = false;
 
-        private void motepass_Unchecked(object sender, RoutedEventArgs e)
-        {
-            mvm.passtrough = true;
-        }
+        private void Motepass_Unchecked(object sender, RoutedEventArgs e) => mvm.passtrough = true;
 
         private void RF_tp_Click(object sender, RoutedEventArgs e)
         {
@@ -1061,18 +774,15 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void log_TextChanged_1(object sender, TextChangedEventArgs e)
+        private void Log_TextChanged_1(object sender, TextChangedEventArgs e)
         {
             try
             {
                 mvm.GameConfiguration.GameName = gn.Text;
             }
-            catch (Exception)
-            {
-
-            }
+            catch { }
         }
-        private void ancast_OTP(object sender, RoutedEventArgs e)
+        private void Ancast_OTP(object sender, RoutedEventArgs e)
         {
             ancastKey.Text = ReadAncastFromOtp();
         }

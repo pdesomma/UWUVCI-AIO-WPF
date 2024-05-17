@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="UWUVCI_AIO_WPF.UI.Pages.IconTgaPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:WiiUInjector.ViewModels.Tga;assembly=WiiUInjector.ViewModels"
+      xmlns:controls="clr-namespace:UWUVCI_AIO_WPF.UI.Controls"
+      xmlns:converters="clr-namespace:UWUVCI_AIO_WPF.UI.Converters"
+      mc:Ignorable="d"
+      TextBlock.Foreground="{DynamicResource ContentForegroundBrush}"
+      TextBlock.FontFamily="{DynamicResource Font}"            
+      d:DataContext="{d:DesignInstance d:Type=vm:IconViewModel}">
+
+    <UserControl.Resources>
+        <converters:StringToImageSourceConverter x:Key="converter" />
+        <converters:BytesToImageSourceConverter x:Key="bytesConverter" />
+        <BooleanToVisibilityConverter x:Key="boolVisibleConverter" />
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+            
+        <!-- nav-->
+        <WrapPanel VerticalAlignment="Center" Grid.Row="0" Grid.ColumnSpan="2" Margin="15,0,0,0" >
+            <Button Margin="0" Style="{DynamicResource NavButtonStyle}" Command="{Binding Path=NavigationViewModel.BackCommand}" CommandParameter="{Binding Source=3}">Home</Button>
+            <TextBlock Style="{DynamicResource NavTextStyle}" Text="-" />
+            <Button Style="{DynamicResource NavButtonStyle}" Command="{Binding Path=NavigationViewModel.BackCommand}" CommandParameter="{Binding Source=2}">Base Rom</Button>
+            <TextBlock Style="{DynamicResource NavTextStyle}" Text="-" />
+            <Button Style="{DynamicResource NavButtonStyle}" Command="{Binding Path=NavigationViewModel.BackCommand}" CommandParameter="{Binding Source=1}">Config</Button>
+            <TextBlock Style="{DynamicResource NavTextStyle}" Text="-" />
+            <TextBlock Style="{DynamicResource NavTextEndStyle}" Text="Icon Tga" />
+        </WrapPanel>
+
+        <Border Grid.Row="1" Background="{DynamicResource ControlBackgroundBrush}" TextBlock.Foreground="{DynamicResource LoudContentForegroundBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*" />
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Margin="25" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{DynamicResource LoudContentBackgroundBrush}"  >
+                    <StackPanel>
+                        <TextBlock Text="Icon Tga File" FontSize="40" Margin="20"/>
+                        <TextBlock Text="Customize your icon tga file with the settings below." FontSize="16" Margin="20"/>
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Column="1">
+                    <Border 
+                            Background="{DynamicResource ContentBackgroundBrush}"
+                            BorderThickness="2" BorderBrush="White" Width="128" Height="128"  
+                            VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20,0" Panel.ZIndex="20">
+                        <Image Source="{Binding Preview, Converter={StaticResource bytesConverter}}"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
+                    </Border>
+                </Grid>
+
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="{DynamicResource ContentBackgroundBrush}">
+            <Grid>
+                <Grid.RowDefinitions >
+                    <RowDefinition Height="60" />
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Column="0" >
+                    <Grid.RowDefinitions >
+                        <RowDefinition Height="80"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <controls:SourceButtonsControl Margin="25,15" Grid.Row="0" />
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions >
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0"  Margin="30,15" >
+                        <CheckBox TextBlock.Foreground="{DynamicResource ContentForegroundBrush}" Margin="0,0"  
+                                  IsChecked="{Binding Overlay}"
+                                  Grid.Row="1" Content="Use overlay style" Focusable="False" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                        <ListView ItemsSource="{Binding Styles}"
+                                  SelectedItem="{Binding SelectedStyle}"
+                                  SelectedIndex="0"
+                                  Visibility="{Binding Overlay, Converter={StaticResource boolVisibleConverter}}"
+                                  Margin="-20,0"  Grid.Row="2" Style="{DynamicResource IconTemplateListViewStyle}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="2">
+                                        <Image Width="128" Source="{Binding Converter={StaticResource converter}}"></Image>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+
+                    <controls:FileProcessSaveButtonsControl Grid.Row="1" HorizontalAlignment="Right" Margin="10" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+    
+</UserControl>

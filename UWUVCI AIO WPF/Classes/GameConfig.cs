@@ -1,28 +1,20 @@
-﻿using GameBaseClassLibrary;
-using System;
-using UWUVCI_AIO_WPF.Classes;
+﻿using System;
+using WiiUInjector;
 
 namespace UWUVCI_AIO_WPF
 {
     [Serializable]
-    public class GameConfig
+    public class GameConfig : ICloneable
     {
         public GameConfig Clone()
         {
             return this.MemberwiseClone() as GameConfig;
         }
-        public GameConsoles Console { get; set; }
-        public GameBases BaseRom { get; set; }
+        object ICloneable.Clone() => this.Clone();
 
-        private string cBasePath;
-
-        public string CBasePath
-        {
-            get { return cBasePath; }
-            set { cBasePath = value;
-
-            }
-        }
+        public GameConsole Console { get; set; }
+        public BaseRom BaseRom { get; set; }
+        public string CBasePath { get; set; }
 
         public byte[] bootsound;
         public string extension = "";
@@ -44,22 +36,8 @@ namespace UWUVCI_AIO_WPF
         public bool vm = false;
         public bool vmtopal = false;
 
-
         public bool rf = false;
         public bool rfus = false;
         public bool rfjp = false;
-
-
-
-        public PNGTGA TGAIco { get; set; } = new PNGTGA();
-
-
-
-        public PNGTGA TGADrc { get; set; } = new PNGTGA();
-        public PNGTGA TGATv { get; set; } = new PNGTGA();
-        public PNGTGA TGALog { get; set; } = new PNGTGA();
-        public N64Conf N64Stuff { get; set; } = new N64Conf();
-        public N64Conf GBAStuff { get; set; } = new N64Conf();
-
     }
 }

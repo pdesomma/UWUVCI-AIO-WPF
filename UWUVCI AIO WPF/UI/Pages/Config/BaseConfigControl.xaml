@@ -1,0 +1,203 @@
+﻿<UserControl x:Class="UWUVCI_AIO_WPF.UI.Controls.BaseConfigControl"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:UWUVCI_AIO_WPF"
+      xmlns:converters="clr-namespace:UWUVCI_AIO_WPF.UI.Converters"
+      xmlns:controls="clr-namespace:UWUVCI_AIO_WPF.UI.Controls"
+      xmlns:validation="clr-namespace:UWUVCI_AIO_WPF.UI.Validation"
+      mc:Ignorable="d"
+      TextBlock.Foreground="{DynamicResource ContentForegroundBrush}"
+      TextBlock.FontFamily="{DynamicResource Font}"
+      d:DesignHeight="510" d:DesignWidth="643">
+
+    <UserControl.Resources>
+        <Style TargetType="TextBox" x:Key="TextBoxStyle">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <converters:NullHiddenConverter x:Key="conv" />
+    </UserControl.Resources>
+
+    <Grid TextBlock.FontSize="14" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- game name-->
+        <Grid Grid.Row="0" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image 
+                Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,0" Height="18" Source="pack://application:,,,/UI/Images/exclam.png" 
+                VerticalAlignment="Center" ToolTip="Use '|' for 2 lines, e.g. Wii|Sports"  />
+            <TextBlock 
+                Grid.Column="0" Margin="25,0,0,0" Text="Game Name" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <TextBox Margin="5,0,15,0" Grid.Column="1" Style="{StaticResource TextBoxStyle}">
+                <TextBox.Text>
+                    <Binding Path="Name" ValidatesOnDataErrors="True" ValidatesOnExceptions="True" NotifyOnValidationError="True" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validation:GameNameRule />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </Grid>
+        <Border Grid.Row="0" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- rom path -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                <Image Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,0" Height="18" Source="pack://application:,,,/UI/Images/exclam.png" 
+                VerticalAlignment="Bottom" ToolTip="Changing the extension of a ROM may result in a faulty inject. We will not give any support in such cases.">
+                </Image>
+                <TextBlock Grid.Column="0" Margin="3,0,0,0" Text="Rom Path" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+            </WrapPanel>
+            <Button 
+                Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+                Style="{StaticResource CustomButtonStyle}"
+                Command="{Binding OpenRomPathFileDialogCommand}"
+                Content="Select File" />
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="10" Text="{Binding RomPath}" />
+        </Grid>
+        <Border Grid.Row="1" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- icon -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="10,0,0,0" Text="Icon Image" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button 
+                Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+                Style="{StaticResource CustomButtonStyle}" 
+                Command="{Binding NavigateToFileProcessingCommand}" CommandParameter="{x:Static local:PageNames.Icon}"
+                Content="Create" />
+            <controls:PreviewTgaButtonsControl DataContext="{Binding IconViewModel}" Grid.Column="2"/>
+        </Grid>
+        <Border Grid.Row="2" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- tv -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="10,0,0,0" Text="Tv Image" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button 
+            Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+            Style="{StaticResource CustomButtonStyle}" 
+            Command="{Binding NavigateToFileProcessingCommand}" CommandParameter="{x:Static local:PageNames.Tv}"
+            Content="Create" />
+
+            <controls:PreviewTgaButtonsControl DataContext="{Binding TvViewModel}" Grid.Column="2"/>
+        </Grid>
+        <Border Grid.Row="3" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- gamepad -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="10,0,0,0" Text="Gamepad Image" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button 
+                Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+                Style="{StaticResource CustomButtonStyle}" 
+                Command="{Binding NavigateToFileProcessingCommand}" CommandParameter="{x:Static local:PageNames.Gamepad}"
+                Content="Create" />
+            <controls:PreviewTgaButtonsControl DataContext="{Binding GamepadViewModel}" Grid.Column="2"/>
+        </Grid>
+        <Border Grid.Row="4" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- logo -->
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="10,0,0,0" Text="Logo Image" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button 
+                Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+                Style="{StaticResource CustomButtonStyle}"                            
+                Command="{Binding NavigateToFileProcessingCommand}" CommandParameter="{x:Static local:PageNames.Logo}"
+                Content="Create" />
+            <controls:PreviewTgaButtonsControl DataContext="{Binding LogoViewModel}" Grid.Column="2"/>
+        </Grid>
+        <Border Grid.Row="5" Margin="0,5" BorderBrush="#DADADA" BorderThickness="0,0,0,1"></Border>
+
+        <!-- boot sound -->
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+            <Image  
+                Grid.Column="0" Margin="5,0,0,0" Height="18" Source="pack://application:,,,/UI/Images/exclam.png" 
+                VerticalAlignment="Center" HorizontalAlignment="Left"  
+                ToolTip="Needs to be a RIFF WAVE file 48000khz and 16bit stereo. Will be cut to 6 seconds." />
+            <TextBlock Grid.Column="0" Margin="25,0,0,0" Text="Boot Sound" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+            <Button 
+                Grid.Column="1" Margin="5" VerticalAlignment="Center" Height="40"
+                Style="{StaticResource CustomButtonStyle}" 
+                Command="{Binding NavigateToFileProcessingCommand}" CommandParameter="{x:Static local:PageNames.Bootsound}"
+                Content="Create" />
+            <Button 
+                Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="40"    
+                Visibility="{Binding BootsoundViewModel.ProcessedFileLocation, Converter={StaticResource conv}}"
+                Command="{Binding BootsoundViewModel.ActivatePreviewCommand}"
+                Style="{StaticResource CustomButtonStyle}">
+                <Button.Content>
+                    <Image Margin="5" Source="pack://application:,,,/UI/Images/play.png"></Image>
+                </Button.Content>
+            </Button>
+            <Button 
+                Grid.Column="3" Margin="5" VerticalAlignment="Center" Height="40"                           
+                Visibility="{Binding BootsoundViewModel.ProcessedFileLocation, Converter={StaticResource conv}}"
+                Command="{Binding BootsoundViewModel.ClearProcessedFileCommand}"
+                Style="{StaticResource CustomButtonStyle}">
+                <Button.Content>
+                    <Image Margin="5" Source="pack://application:,,,/UI/Images/clear.png"></Image>
+                </Button.Content>
+            </Button>
+        </Grid>
+
+        <WrapPanel Grid.Row="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+            <Button
+                Style="{DynamicResource CustomButtonStyle}" 
+                Command="{Binding BackCommand}"
+                Content="Back" Width="80" Height="40" Margin="5,0,10,10"/>
+            <Button
+                Style="{DynamicResource CustomButtonStyle}" 
+                Command="{Binding ConfirmConfigCommand}"
+                Content="Next" Width="80" Height="40" Margin="5,0,10,10"/>
+        </WrapPanel>
+
+    </Grid>
+</UserControl>

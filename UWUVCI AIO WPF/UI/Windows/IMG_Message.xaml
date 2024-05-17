@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:UWUVCI_AIO_WPF"
        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MAIN" Height="250" Width="490" MinHeight="250" MinWidth="490" MaxHeight="250" materialDesign:ShadowAssist.CacheMode="{x:Null}" MaxWidth="490" WindowStyle="None" WindowStartupLocation="CenterOwner" Foreground="White" Background="LightGray" ResizeMode="NoResize" Icon="/UWUVCI AIO WPF;component/a.ico" Name="wind" SizeToContent="WidthAndHeight" BorderBrush="#FF2196F3" BorderThickness="1.5,1.5,1.5,1.5" ShowInTaskbar="False" Closing="wind_Closing" Closed="wind_Closed">
+        Title="MAIN" Height="250" Width="490" MinHeight="250" MinWidth="490" MaxHeight="250" MaxWidth="490" WindowStyle="None" WindowStartupLocation="CenterOwner" Foreground="White" Background="LightGray" ResizeMode="NoResize" Icon="/UWUVCI AIO WPF;component/a.ico" Name="wind" SizeToContent="WidthAndHeight" BorderBrush="#FF2196F3" BorderThickness="1.5,1.5,1.5,1.5" ShowInTaskbar="False">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -15,7 +15,7 @@
             <RowDefinition Height="49*"/>
             <RowDefinition Height="18*"/>
         </Grid.RowDefinitions>
-        <TextBlock HorizontalAlignment="Left" Margin="7,2,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" Width="463" FontSize="15" Foreground="Black" Name="Title" Grid.Row="0" FontWeight="Bold" Text="Do you want to use these BootImages?" Grid.RowSpan="2"/>
+        <TextBlock HorizontalAlignment="Left" Margin="7,2,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" Width="463" FontSize="15" Foreground="Black" Name="txtTi" Grid.Row="0" FontWeight="Bold" Text="Do you want to use these BootImages?" Grid.RowSpan="2"/>
         <Image Margin="352,15,10,8" Grid.Row="1" Source="/UWUVCI AIO WPF;component/UI/Images/iconborder.png" Name="icb"/>
         <Image Name="icon" Margin="354,17,12,10" Grid.Row="1" />
 
