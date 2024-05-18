@@ -43,7 +43,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            msgT.Text = mvm.Msg;
+//            msgT.Text = mvm.Msg;
         }
 
         public void ChangeOwner(MainWindow ow)

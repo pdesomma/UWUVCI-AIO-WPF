@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackupType.cs" />
+    <Compile Include="Configs\WiiConfig.cs" />
     <Compile Include="MetadataFileNames.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="Configs\GbaConfig.cs" />

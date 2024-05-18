@@ -50,6 +50,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Injectors\WiiInjector.cs" />
     <Compile Include="Services\BaseRomService.cs" />
     <Compile Include="Injectors\GcInjector.cs" />
     <Compile Include="Injectors\NdsInjector.cs" />

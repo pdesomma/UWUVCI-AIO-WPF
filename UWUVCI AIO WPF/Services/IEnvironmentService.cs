@@ -6,5 +6,4 @@
         bool AllowSpaceBypass { get; }
         bool SkipInstanceCheck { get; }
     }
-
 }

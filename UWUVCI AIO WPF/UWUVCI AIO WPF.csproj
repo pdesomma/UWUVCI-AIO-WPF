@@ -69,9 +69,6 @@
     <Reference Include="CSharpDecrypt, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDecryptSharp.1.0.4\lib\CSharpDecrypt.dll</HintPath>
     </Reference>
-    <Reference Include="GameBaseClassLibrary">
-      <HintPath>..\..\..\uwuvci_installer_creator\{app}\GameBaseClassLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="GMWare.M2, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GMWare.M2.1.1.2\lib\netstandard2.0\GMWare.M2.dll</HintPath>
     </Reference>
@@ -136,7 +133,7 @@
     <Compile Include="ToadDialogService.cs" />
     <Compile Include="Services\CommonKeyDialogService.cs" />
     <Compile Include="Services\ExceptionDialogService.cs" />
-    <Compile Include="EnvironmentService.cs" />
+    <Compile Include="Services\EnvironmentService.cs" />
     <Compile Include="UI\Converters\MultiplyConverter.cs" />
     <Compile Include="UI\Converters\BooleanHiddenConverter.cs" />
     <Compile Include="UI\Converters\RegionToImageSourceConverter.cs" />
@@ -209,7 +206,7 @@
     <Compile Include="UI\Windows\CommonKeyDialogWindow.xaml.cs">
       <DependentUpon>CommonKeyDialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IEnvironmentService.cs" />
+    <Compile Include="Services\IEnvironmentService.cs" />
     <Compile Include="CannedText.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="UI\Frames\InjectFrames\Configurations\GcConfig.xaml.cs">

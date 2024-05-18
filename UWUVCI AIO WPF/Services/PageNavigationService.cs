@@ -41,7 +41,7 @@ namespace UWUVCI_AIO_WPF
         /// <summary>
         /// The name of the current page.
         /// </summary>
-        public string CurrentPage => _stack.Peek();
+        public string CurrentPage => _stack.Count > 0 ? _stack.Peek() : null;
 
         /// <summary>
         /// Navigate back.

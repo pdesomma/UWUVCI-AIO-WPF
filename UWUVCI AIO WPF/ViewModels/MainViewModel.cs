@@ -16,8 +16,8 @@ using UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations;
 using UWUVCI_AIO_WPF.UI.Windows;
 using WiiUInjector;
 using WiiUInjector.Configs;
-using WiiUInjector.Services;
 using WiiUInjector.Messaging;
+using WiiUInjector.Services;
 using WiiUInjector.ViewModels;
 using WiiUInjector.ViewModels.Configs;
 using WiiUInjector.ViewModels.Notifications;
@@ -250,12 +250,6 @@ namespace UWUVCI_AIO_WPF.ViewModels
         {
             get => _lGameBasesString;
             set => SetProperty(ref _lGameBasesString, value);
-        }
-
-        public string Msg
-        {
-            get => _msg;
-            set => SetProperty(ref _msg, value);
         }
 
         public bool NKITFLAG { get; set; } = false;
