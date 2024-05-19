@@ -12,6 +12,8 @@ namespace WiiUInjector.GitTools
 {
     public sealed class WiiInjector : Injector<WiiConfig>
     {
+        private readonly ITool _isoTool = ToolBox.Tools.WitTool;
+
         /// <summary>
         /// Creates a new instance of the <see cref="WiiInjector"/> class.
         /// </summary>
@@ -42,54 +44,26 @@ namespace WiiUInjector.GitTools
         /// <param name="config"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private Task RunWiiAsync(WiiConfig config)
+        private async Task RunWiiAsync(WiiConfig config)
         {
             string savedir = Directory.GetCurrentDirectory();
+
+            // get an ISO to use.
             if (config.NKit)
             {
-                using (Process toiso = new Process())
-                {
-                    //mvm.Msg = "Converting NKIT to ISO";
-                    if (!mvm.DebugMode)
-                    {
-                        toiso.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        // toiso.StartInfo.CreateNoWindow = true;
-                    }
-                    toiso.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                    toiso.StartInfo.Arguments = $"copy --source \"{romPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I";
-
-                    toiso.Start();
-                    toiso.WaitForExit();
-                    if (!File.Exists(Path.Combine(toolsPath, "out.iso")))
-                    {
-                        throw new Exception("nkit");
-                    }
-                    File.Move(Path.Combine(toolsPath, "out.iso"), Path.Combine(tempPath, "pre.iso"));
-                }
+                await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I");
+                if (!File.Exists(Path.Combine(ToolBox.ToolsDirectory, "out.iso"))) throw new Exception("nkit");               
+                File.Move(Path.Combine(ToolBox.ToolsDirectory, "out.iso"), Path.Combine(ToolBox.ToolsDirectory, "pre.iso"));
             }
             else
             {
-                if (new FileInfo(romPath).Extension.Contains("wbfs"))
+                if (new FileInfo(config.RomPath).Extension.Contains("wbfs"))
                 {
-                    //mvm.Msg = "Converting WBFS to ISO...";
-                    using (Process toiso = new Process())
-                    {
-                        if (!mvm.DebugMode)
-                        {
-                            toiso.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                            // toiso.StartInfo.CreateNoWindow = true;
-                        }
-                        toiso.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                        toiso.StartInfo.Arguments = $"copy --source \"{romPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I";
-
-                        toiso.Start();
-                        toiso.WaitForExit();
-                    }
+                    await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I");
                 }
-                else if (new FileInfo(romPath).Extension.Contains("iso"))
+                else if (new FileInfo(config.RomPath).Extension.Contains("iso"))
                 {
-                    //mvm.Msg = "Copying ROM...";
-                    File.Copy(romPath, Path.Combine(tempPath, "pre.iso"));
+                    File.Copy(config.RomPath, Path.Combine(tempPath, "pre.iso"));
                 }
             }
             //GET ROMCODE and change it
@@ -151,11 +125,6 @@ namespace WiiUInjector.GitTools
                 }
                 using (Process trimm = new Process())
                 {
-                    if (!mvm.DebugMode)
-                    {
-
-                        trimm.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    }
                     //mvm.Msg = "Trimming ROM...";
                     trimm.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
                     trimm.StartInfo.Arguments = $"extract \"{Path.Combine(tempPath, "pre.iso")}\" --DEST \"{Path.Combine(tempPath, "TEMP")}\" --psel data -vv1";
@@ -198,11 +167,9 @@ namespace WiiUInjector.GitTools
                 }
                 if (mvm.Patch)
                 {
-
                     //mvm.Msg = "Video Patching ROM...";
                     using (Process vmc = new Process())
                     {
-
                         File.Copy(Path.Combine(toolsPath, "wii-vmc.exe"), Path.Combine(tempPath, "TEMP", "sys", "wii-vmc.exe"));
 
                         Directory.SetCurrentDirectory(Path.Combine(tempPath, "TEMP", "sys"));
@@ -232,11 +199,6 @@ namespace WiiUInjector.GitTools
                 //mvm.Msg = "Creating ISO from trimmed ROM...";
                 using (Process repack = new Process())
                 {
-                    if (!mvm.DebugMode)
-                    {
-
-                        repack.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    }
                     repack.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
                     repack.StartInfo.Arguments = $"copy \"{Path.Combine(tempPath, "TEMP")}\" --DEST \"{Path.Combine(tempPath, "game.iso")}\" -ovv --links --iso";
                     repack.Start();
