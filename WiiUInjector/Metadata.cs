@@ -1,4 +1,4 @@
-﻿namespace WiiUInjector.Configs
+﻿namespace WiiUInjector
 {
     /// <summary>
     /// Extra metadata to add to the injection.

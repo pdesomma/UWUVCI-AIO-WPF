@@ -186,10 +186,6 @@ namespace UWUVCI_AIO_WPF
                     {
                         WiiForwarder(RomPath, mvm);
                     }
-                    else
-                    {
-                        WII(RomPath, mvm);
-                    }
                     break;
             }
         }
@@ -282,10 +278,7 @@ namespace UWUVCI_AIO_WPF
                 }
                 iso2nfs.StartInfo.FileName = "nfs2iso2nfs.exe";
                 string extra = "";
-                if (mvm.Index == 2)
-                {
-                    extra = "-horizontal ";
-                }
+                if (mvm.Index == 2) { extra = "-horizontal "; }
                 if (mvm.Index == 3) { extra = "-wiimote "; }
                 if (mvm.Index == 4) { extra = "-instantcc "; }
                 if (mvm.Index == 5) { extra = "-nocc "; }

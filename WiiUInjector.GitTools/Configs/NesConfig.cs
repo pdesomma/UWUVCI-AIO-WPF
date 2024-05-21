@@ -1,4 +1,4 @@
-﻿namespace WiiUInjector.Configs
+﻿namespace WiiUInjector.GitTools.Configs
 {
     /// <summary>
     /// NES config

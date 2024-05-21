@@ -19,6 +19,7 @@ namespace WiiUInjector.GitTools
             public static ITool ConvertIsoTool = new Tool("ConvertToISO.exe");
             public static ITool ConvertNKitTool = new Tool("ConvertToNKit.exe");
             public static ITool DecryptTool = new Tool("CDecrypt.exe");
+            public static ITool ForceClassicPatchTool = new Tool("GetExtTypePatcher.exe");
             public static ITool GcBaseTool = new Tool("BASE.zip");
             public static ITool GoombaTool = new Tool("goomba.gba");
             public static ITool JpgTgaTool = new Tool("jpg2tga.exe");
@@ -37,6 +38,7 @@ namespace WiiUInjector.GitTools
             public static ITool TgaVerifierTool = new Tool("tga_verify.exe");
             public static ITool TurboCdTool = new Tool("BuildTurboCdPcePkg.exe");
             public static ITool TurboTool = new Tool("BuildPcePkg.exe");
+            public static ITool WiiVmcTool = new Tool("wii-vmc.exe");
             public static ITool WitTool = new Tool("wit.exe");
             public static ITool WupPackTool = new Tool("CNUSPACKER.exe");
         }

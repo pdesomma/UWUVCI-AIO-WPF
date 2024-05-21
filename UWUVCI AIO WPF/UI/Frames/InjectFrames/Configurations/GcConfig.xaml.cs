@@ -56,7 +56,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             InitializeComponent();
             mvm = DataContext as MainViewModel;
             mvm.GameConfiguration = c.Clone(); 
-            getInfoFromConfig();
+            GetInfoFromConfig();
             mvm.SetThing(this);
             Injection.ToolTip = "Changing the extension of a ROM may result in a faulty inject.\nWe will not give any support in such cases";
             mvm.test = GameConsole.GCN;
@@ -66,7 +66,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
         {
 
         }
-        public void imgpath(string icon, string tv)
+        public void ImgPath(string icon, string tv)
         {
             ic.Text = icon;
             this.tv.Text = tv;
@@ -107,14 +107,14 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                     {
                         trimn.IsEnabled = false;
                         trimn.IsChecked = false;
-                        trimn_Click(null, null);
+                        Trimn_Click(null, null);
                     }
                     mvm.RomPath = path;
                     mvm.RomSet = true;
                     if (!path.ToLower().Contains(".gcz"))
                     {
                         trimn.IsChecked = false;
-                        trimn_Click(null, null);
+                        Trimn_Click(null, null);
                         string rom = await mvm.GetInternalWIIGCNName(mvm.RomPath, true);
                         Regex reg = new Regex("[*'\",_&#^@:;?!<>|µ~#°²³´`éⓇ©™]");
                         gn.Text = reg.Replace(rom, string.Empty);
@@ -182,7 +182,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 logIMG.Visibility = Visibility.Visible;
             }
         }
-        public void getInfoFromConfig()
+        public void GetInfoFromConfig()
         {
             rp.Text = "";
             mvm.RomPath = "";
@@ -241,7 +241,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             mvm.cd = cd;
         }
 
-        private void gn_KeyUp(object sender, KeyEventArgs e)
+        private void Gn_KeyUp(object sender, KeyEventArgs e)
         {
 
             /*Regex reg = new Regex("[^a-zA-Z0-9 é -]");
@@ -280,7 +280,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
                 mvm.GC2Rom = path;
             }
         }
-        public void reset()
+        public void Reset()
         {
             gc2.Text = "";
             tv.Text = "";
@@ -289,28 +289,28 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             ic.Text = "";
             log.Text = "";
         }
-        private void icoIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
+        private void IcoIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
 
-        private void tvIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TvIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TDRSHOW t = new TDRSHOW(tv.Text, false);
             t.ShowDialog();
         }
 
-        private void drcIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void DrcIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TDRSHOW t = new TDRSHOW(drc.Text, true);
             t.ShowDialog();
 
         }
 
-        private void logIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void LogIMG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LOGSHOW t = new LOGSHOW(log.Text);
             t.ShowDialog();
         }
 
-        private void ic_TextChanged(object sender, TextChangedEventArgs e)
+        private void Ic_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (ic.Text.Length > 0)
             {
@@ -335,7 +335,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void tv_TextChanged(object sender, TextChangedEventArgs e)
+        private void Tv_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (tv.Text.Length > 0)
             {
@@ -347,7 +347,7 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void log_TextChanged(object sender, TextChangedEventArgs e)
+        private void Log_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (log.Text.Length > 0)
             {
@@ -428,8 +428,8 @@ namespace UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations
             }
         }
 
-        private void trimn_Click(object sender, RoutedEventArgs e) => mvm.donttrim = trimn.IsChecked ?? false;
+        private void Trimn_Click(object sender, RoutedEventArgs e) => mvm.donttrim = trimn.IsChecked ?? false;
 
-        private void gn_TextChanged(object sender, TextChangedEventArgs e) => mvm.GameConfiguration.GameName = gn?.Text;
+        private void Gn_TextChanged(object sender, TextChangedEventArgs e) => mvm.GameConfiguration.GameName = gn?.Text;
     }
 }

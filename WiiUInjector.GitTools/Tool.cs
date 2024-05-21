@@ -39,6 +39,40 @@ namespace WiiUInjector.GitTools
         }
 
         /// <summary>
+        /// Copy the tool to a new location on the disk.
+        /// </summary>
+        /// <param name="path"></param>
+        public ITool Copy(string path)
+        {
+            if (Location != null)
+            {
+                File.Copy(Path.Combine(Location, Name), Path.Combine(path, Name));
+                foreach (var s in _support)
+                {
+                    File.Copy(Path.Combine(Location, s), Path.Combine(path, s));
+                }
+                Location = path;
+            }
+            var copyTool = new Tool(this.Name, this._support.ToArray()) { Location = path };
+            return copyTool;
+        }
+
+        /// <summary>
+        /// Delete itself from the disk.
+        /// </summary>
+        public void Delete()
+        {
+            if (Location != null)
+            {
+                File.Delete(Path.Combine(Location, Name));
+                foreach (var s in _support)
+                {
+                    File.Delete(Path.Combine(Location, s));
+                }
+            }
+        }
+
+        /// <summary>
         /// File location of the tool.
         /// </summary>
         public string Location { get; private set; }

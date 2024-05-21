@@ -73,24 +73,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackupType.cs" />
-    <Compile Include="Configs\WiiConfig.cs" />
     <Compile Include="MetadataFileNames.cs" />
     <Compile Include="Metadata.cs" />
-    <Compile Include="Configs\GbaConfig.cs" />
-    <Compile Include="Configs\NdsConfig.cs" />
-    <Compile Include="Configs\MsxConfig.cs" />
-    <Compile Include="Configs\GcConfig.cs" />
-    <Compile Include="Configs\SnesConfig.cs" />
-    <Compile Include="Configs\Tg16Config.cs" />
-    <Compile Include="Configs\N64Config.cs" />
     <Compile Include="Exceptions\InjectionException.cs" />
     <Compile Include="Injection.cs" />
     <Compile Include="BaseRom.cs" />
-    <Compile Include="Configs\Config.cs" />
-    <Compile Include="Configs\NesConfig.cs" />
     <Compile Include="Exceptions\BaseRomException.cs" />
     <Compile Include="Exceptions\CommonKeyException.cs" />
-    <Compile Include="Exceptions\ConfigException.cs" />
     <Compile Include="GameConsole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BackupSize.cs" />

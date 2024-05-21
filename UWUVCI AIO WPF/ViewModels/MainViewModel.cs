@@ -15,7 +15,7 @@ using UWUVCI_AIO_WPF.Properties;
 using UWUVCI_AIO_WPF.UI.Frames.InjectFrames.Configurations;
 using UWUVCI_AIO_WPF.UI.Windows;
 using WiiUInjector;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Messaging;
 using WiiUInjector.Services;
 using WiiUInjector.ViewModels;
@@ -107,7 +107,6 @@ namespace UWUVCI_AIO_WPF.ViewModels
         private string _injectStore;
         private List<BaseRom> _lBases = new List<BaseRom>();
         private List<string> _lGameBasesString = new List<string>();
-        private string _msg;
         private bool _pathsSet = false;
         private string _romPath;
 
@@ -144,7 +143,7 @@ namespace UWUVCI_AIO_WPF.ViewModels
             GreetingText = CommonKeyViewModel.CommonKey is null ? CannedText.Greeting : CannedText.WelcomeBack;
 
             // listen for selections
-            Messenger.Register<BaseSelectedNotification>((n) => InjectionViewModel = new InjectionViewModel(Config.Config, n.Selection.BaseRom, _injectionService, CommonKeyViewModel, BackgroundTaskViewModel, ExceptionViewModel));
+            Messenger.Register<BaseSelectedNotification>((n) => InjectionViewModel = new InjectionViewModel(n.Selection.BaseRom, _injectionService, CommonKeyViewModel, BackgroundTaskViewModel, ExceptionViewModel));
             Messenger.Register<ConsoleSelectedNotification>((n) => HandleConsoleSelectedNotification(n.Selection));
         }
 
@@ -609,7 +608,7 @@ namespace UWUVCI_AIO_WPF.ViewModels
             }
             else if (test == GameConsole.GCN)
             {
-                (Thing as GCConfig).getInfoFromConfig();
+                (Thing as GCConfig).GetInfoFromConfig();
             }
         }
 

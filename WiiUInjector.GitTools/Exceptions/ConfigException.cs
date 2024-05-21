@@ -1,7 +1,7 @@
 ﻿using System;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 
-namespace WiiUInjector.Exceptions
+namespace WiiUInjector.GitTools.Exceptions
 {
     public class ConfigException : Exception
     {

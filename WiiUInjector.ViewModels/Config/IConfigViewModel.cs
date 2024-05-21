@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.ViewModels.BootSound;
 using WiiUInjector.ViewModels.Tga;
 

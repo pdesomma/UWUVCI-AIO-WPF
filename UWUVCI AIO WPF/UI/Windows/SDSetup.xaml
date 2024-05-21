@@ -11,9 +11,9 @@
         </Grid>
         <Button Content="Button" HorizontalAlignment="Left" Margin="311,6,0,0" VerticalAlignment="Top" Width="18" Background="{x:Null}" BorderBrush="{x:Null}" Height="25" Click="Window_Close" Name="close" MouseEnter="Close_MouseEnter" MouseLeave="Close_MouseLeave"/>
         <TextBlock HorizontalAlignment="Left" Margin="315,7,0,0" TextWrapping="Wrap" Text="X" VerticalAlignment="Top" Foreground="White" FontSize="16" IsHitTestVisible="False"/>
-        <ComboBox HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Width="313" Name="sd" Foreground="Black" SelectionChanged="sd_SelectionChanged"/>
+        <ComboBox HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Width="313" Name="sd" Foreground="Black" SelectionChanged="Sd_SelectionChanged"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,61,0,0" TextWrapping="Wrap" Text="Choose your SD Card:" VerticalAlignment="Top" Foreground="Black" />
-        <Button Content="Setup SD Card" HorizontalAlignment="Left" Margin="199,129,0,0" VerticalAlignment="Top" Width="124" Height="28" IsEnabled="False" Name="setup" Click="setup_Click"/>
+        <Button Content="Setup SD Card" HorizontalAlignment="Left" Margin="199,129,0,0" VerticalAlignment="Top" Width="124" Height="28" IsEnabled="False" Name="setup" Click="Setup_Click"/>
         <Label Content="" Margin="10,131,263,-131" Name="status"/>
         <Border  BorderThickness="1.5,1.5,1.5,1.5" BorderBrush="#FF2196F3" HorizontalAlignment="Left" Height="175" VerticalAlignment="Top" Width="337">
 

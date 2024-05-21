@@ -1,4 +1,4 @@
-﻿using WiiUInjector.Configs;
+﻿using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Services;
 using WiiUInjector.ViewModels.Services;
 

@@ -1,18 +1,23 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Management.Instrumentation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 
 namespace WiiUInjector.GitTools
 {
     public sealed class WiiInjector : Injector<WiiConfig>
     {
         private readonly ITool _isoTool = ToolBox.Tools.WitTool;
+        private readonly ITool _nfsIsoTool = ToolBox.Tools.Nfs2IsoTool;
+        private readonly ITool _wiiVmcTool = ToolBox.Tools.WiiVmcTool;
+        private readonly ITool _forceClassic = ToolBox.Tools.ForceClassicPatchTool;
 
         /// <summary>
         /// Creates a new instance of the <see cref="WiiInjector"/> class.
@@ -22,9 +27,9 @@ namespace WiiUInjector.GitTools
         /// <summary>
         /// Does injection work for Gamecube roms.
         /// </summary>
-        protected override async Task RunSpecificInjectionAsync(WiiConfig config, BaseRom injectionBase, string directory, bool force)
+        protected override async Task RunSpecificInjectionAsync(WiiConfig config, BaseRom baseRom, string directory, bool force)
         {
-            switch (Path.GetExtension(config.RomPath.ToLower())
+            switch (Path.GetExtension(config.RomPath.ToLower()))
             {
                 case "dol":
                     await RunHomebrewAsync(config);
@@ -33,7 +38,7 @@ namespace WiiUInjector.GitTools
                     await RunForwardAsync(config);
                     break;
                 default:
-                    await RunWiiAsync(config);
+                    await RunWiiAsync(config, baseRom);
                     break;
             }
         }
@@ -44,14 +49,15 @@ namespace WiiUInjector.GitTools
         /// <param name="config"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private async Task RunWiiAsync(WiiConfig config)
+        private async Task RunWiiAsync(WiiConfig config, BaseRom baseRom)
         {
             string savedir = Directory.GetCurrentDirectory();
+            string preIsoPath = Path.Combine(tempPath, "pre.iso");
 
             // get an ISO to use.
             if (config.NKit)
             {
-                await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I");
+                await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{preIsoPath}\" -I");
                 if (!File.Exists(Path.Combine(ToolBox.ToolsDirectory, "out.iso"))) throw new Exception("nkit");               
                 File.Move(Path.Combine(ToolBox.ToolsDirectory, "out.iso"), Path.Combine(ToolBox.ToolsDirectory, "pre.iso"));
             }
@@ -59,101 +65,51 @@ namespace WiiUInjector.GitTools
             {
                 if (new FileInfo(config.RomPath).Extension.Contains("wbfs"))
                 {
-                    await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{Path.Combine(tempPath, "pre.iso")}\" -I");
+                    await _isoTool.UseAsync($"copy --source \"{config.RomPath}\" --dest \"{preIsoPath}\" -I");
                 }
                 else if (new FileInfo(config.RomPath).Extension.Contains("iso"))
                 {
-                    File.Copy(config.RomPath, Path.Combine(tempPath, "pre.iso"));
+                    File.Copy(config.RomPath, preIsoPath);
                 }
             }
-            //GET ROMCODE and change it
-            //mvm.Msg = "Trying to change the Manual...";
-            //READ FIRST 4 BYTES
+
+            // change the manual
             byte[] chars = new byte[4];
-            FileStream fstrm = new FileStream(Path.Combine(tempPath, "pre.iso"), FileMode.Open);
-            fstrm.Read(chars, 0, 4);
-            fstrm.Close();
-            string procod = ByteArrayToString(chars);
-            string neededformanual = procod.ToHex();
-            string metaXml = Path.Combine(baseRomPath, "meta", "meta.xml");
-            XmlDocument doc = new XmlDocument();
-            doc.Load(metaXml);
-            doc.SelectSingleNode("menu/reserved_flag2").InnerText = neededformanual;
-            doc.Save(metaXml);
-            //edit emta.xml
-
-            if (!mvm.donttrim)
+            using (var fstrm = new FileStream(preIsoPath, FileMode.Open))
             {
-                if (mvm.regionfrii)
+                fstrm.Read(chars, 0, 4);
+                fstrm.Close();
+            }
+            string romCode = new ASCIIEncoding().GetString(chars);
+            string neededForManual = ToHex(romCode);
+            string metaXml = Path.Combine(baseRom.Path, "meta", "meta.xml");
+            XmlDocument doc = new XmlDocument();            
+            doc.Load(metaXml);
+            doc.SelectSingleNode("menu/reserved_flag2").InnerText = neededForManual;
+            doc.Save(metaXml);
+
+            if (!config.DontTrim)
+            {
+                // figure out region frii
+                if (config.RegionFriiUs)
                 {
-                    if (mvm.regionfriius)
-                    {
-                        using (FileStream fs = new FileStream(Path.Combine(tempPath, "pre.iso"), FileMode.Open))
-                        {
-                            fs.Seek(0x4E003, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x01 }, 0, 1);
-                            fs.Seek(0x4E010, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x80, 0x06, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }, 0, 16);
-                            fs.Close();
-
-                        }
-                    }
-                    else if (mvm.regionfriijp)
-                    {
-                        using (FileStream fs = new FileStream(Path.Combine(tempPath, "pre.iso"), FileMode.Open))
-                        {
-                            fs.Seek(0x4E003, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x00 }, 0, 1);
-                            fs.Seek(0x4E010, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }, 0, 16);
-                            fs.Close();
-
-                        }
-                    }
-                    else
-                    {
-                        using (FileStream fs = new FileStream(Path.Combine(tempPath, "pre.iso"), FileMode.Open))
-                        {
-                            fs.Seek(0x4E003, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x02 }, 0, 1);
-                            fs.Seek(0x4E010, SeekOrigin.Begin);
-                            fs.Write(new byte[] { 0x80, 0x80, 0x80, 0x00, 0x03, 0x03, 0x04, 0x03, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }, 0, 16);
-                            fs.Close();
-
-                        }
-                    }
+                    WriteRegionFriiBytes(preIsoPath, new byte[] { 0x01 }, new byte[] { 0x80, 0x06, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 });
                 }
-                using (Process trimm = new Process())
+                else if (config.RegionFriiJp)
                 {
-                    //mvm.Msg = "Trimming ROM...";
-                    trimm.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                    trimm.StartInfo.Arguments = $"extract \"{Path.Combine(tempPath, "pre.iso")}\" --DEST \"{Path.Combine(tempPath, "TEMP")}\" --psel data -vv1";
-                    trimm.Start();
-                    trimm.WaitForExit();
+                    WriteRegionFriiBytes(preIsoPath, new byte[] { 0x00 }, new byte[] { 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 });
                 }
-                if (mvm.Index == 4)
+                else if (config.RegionFriiEu)
                 {
-                    //mvvm.Msg = "Patching ROM (Force CC)...";
-                    Console.WriteLine("Patching the ROM to force Classic Controller input");
-                    using (Process tik = new Process())
-                    {
-                        tik.StartInfo.FileName = Path.Combine(toolsPath, "GetExtTypePatcher.exe");
-                        tik.StartInfo.Arguments = $"\"{Path.Combine(tempPath, "TEMP", "sys", "main.dol")}\" -nc";
-                        tik.StartInfo.UseShellExecute = false;
-                        tik.StartInfo.CreateNoWindow = true;
-                        tik.StartInfo.RedirectStandardOutput = true;
-                        tik.StartInfo.RedirectStandardInput = true;
-                        tik.Start();
-                        Thread.Sleep(2000);
-                        tik.StandardInput.WriteLine();
-                        tik.WaitForExit();
-                    }
-
+                    WriteRegionFriiBytes(preIsoPath, new byte[] { 0x02 }, new byte[] { 0x80, 0x80, 0x80, 0x00, 0x03, 0x03, 0x04, 0x03, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 });
                 }
-                if (mvm.jppatch)
-                {
 
-                    //mvm.Msg = "Language Patching ROM...";
+                // trim the rom
+                await _isoTool.UseAsync($"extract \"{preIsoPath}\" --DEST \"{Path.Combine(tempPath, "TEMP")}\" --psel data -vv1");
+
+                if (config.UseGamepadAs == WiiUseGamePadAs.ForceClassic) await PatchForceClassicAsync($"\"{Path.Combine(tempPath, "TEMP", "sys", "main.dol")}\" -nc");
+                if (config.PatchLanguage)
+                {
                     using (BinaryWriter writer = new BinaryWriter(new FileStream(Path.Combine(tempPath, "TEMP", "sys", "main.dol"), FileMode.Open)))
                     {
                         byte[] stuff = new byte[] { 0x38, 0x60 };
@@ -165,191 +121,117 @@ namespace WiiUInjector.GitTools
                         writer.Close();
                     }
                 }
-                if (mvm.Patch)
-                {
-                    //mvm.Msg = "Video Patching ROM...";
-                    using (Process vmc = new Process())
-                    {
-                        File.Copy(Path.Combine(toolsPath, "wii-vmc.exe"), Path.Combine(tempPath, "TEMP", "sys", "wii-vmc.exe"));
+                if (config.PatchVideo) await PatchVideoAsync(config, Path.Combine(tempPath, "TEMP", "sys"));
 
-                        Directory.SetCurrentDirectory(Path.Combine(tempPath, "TEMP", "sys"));
-                        vmc.StartInfo.FileName = "wii-vmc.exe";
-                        vmc.StartInfo.Arguments = "main.dol";
-                        vmc.StartInfo.UseShellExecute = false;
-                        vmc.StartInfo.CreateNoWindow = true;
-                        vmc.StartInfo.RedirectStandardOutput = true;
-                        vmc.StartInfo.RedirectStandardInput = true;
-
-                        vmc.Start();
-                        Thread.Sleep(1000);
-                        vmc.StandardInput.WriteLine("a");
-                        Thread.Sleep(2000);
-                        if (mvm.toPal) vmc.StandardInput.WriteLine("1");
-                        else vmc.StandardInput.WriteLine("2");
-                        Thread.Sleep(2000);
-                        vmc.StandardInput.WriteLine();
-                        vmc.WaitForExit();
-                        File.Delete("wii-vmc.exe");
-
-
-                        Directory.SetCurrentDirectory(savedir);
-                    }
-
-                }
-                //mvm.Msg = "Creating ISO from trimmed ROM...";
-                using (Process repack = new Process())
-                {
-                    repack.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                    repack.StartInfo.Arguments = $"copy \"{Path.Combine(tempPath, "TEMP")}\" --DEST \"{Path.Combine(tempPath, "game.iso")}\" -ovv --links --iso";
-                    repack.Start();
-                    repack.WaitForExit();
-                    Directory.Delete(Path.Combine(tempPath, "TEMP"), true);
-                    File.Delete(Path.Combine(tempPath, "pre.iso"));
-                }
+                // create iso from trimmed rom.
+                _isoTool.UseAsync($"copy \"{Path.Combine(tempPath, "TEMP")}\" --DEST \"{Path.Combine(tempPath, "game.iso")}\" -ovv --links --iso");
+                Directory.Delete(Path.Combine(tempPath, "TEMP"), true);
+                File.Delete(preIsoPath);
             }
             else
             {
-                if (mvm.Index == 4 || mvm.Patch)
+                if (config.UseGamepadAs == WiiUseGamePadAs.ForceClassic || config.PatchVideo)
                 {
-                    using (Process trimm = new Process())
-                    {
-                        if (!mvm.DebugMode)
-                        {
+                    await _isoTool.UseAsync($"extract \"{preIsoPath}\" --DEST \"{Path.Combine(tempPath, "TEMP")}\" --psel WHOLE -vv1");
+                    if (config.UseGamepadAs == WiiUseGamePadAs.ForceClassic) await PatchForceClassicAsync($"\"{Path.Combine(tempPath, "TEMP", "DATA", "sys", "main.dol")}\" -nc");
+                    if (config.PatchVideo) await PatchVideoAsync(config, Path.Combine(tempPath, "TEMP", "DATA", "sys"));
 
-                            trimm.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        }
-                        //mvm.Msg = "Trimming ROM...";
-                        trimm.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                        trimm.StartInfo.Arguments = $"extract \"{Path.Combine(tempPath, "pre.iso")}\" --DEST \"{Path.Combine(tempPath, "TEMP")}\" --psel WHOLE -vv1";
-                        trimm.Start();
-                        trimm.WaitForExit();
-                    }
-                    if (mvm.Index == 4)
-                    {
-                        //mvvm.Msg = "Patching ROM (Force CC)...";
-                        Console.WriteLine("Patching the ROM to force Classic Controller input");
-                        using (Process tik = new Process())
-                        {
-                            tik.StartInfo.FileName = Path.Combine(toolsPath, "GetExtTypePatcher.exe");
-                            tik.StartInfo.Arguments = $"\"{Path.Combine(tempPath, "TEMP", "DATA", "sys", "main.dol")}\" -nc";
-                            tik.StartInfo.UseShellExecute = false;
-                            tik.StartInfo.CreateNoWindow = true;
-                            tik.StartInfo.RedirectStandardOutput = true;
-                            tik.StartInfo.RedirectStandardInput = true;
-                            tik.Start();
-                            Thread.Sleep(2000);
-                            tik.StandardInput.WriteLine();
-                            tik.WaitForExit();
-                        }
-
-                    }
-                    if (mvm.Patch)
-                    {
-                        //mvm.Msg = "Video Patching ROM...";
-                        using (Process vmc = new Process())
-                        {
-
-                            File.Copy(Path.Combine(toolsPath, "wii-vmc.exe"), Path.Combine(tempPath, "TEMP", "DATA", "sys", "wii-vmc.exe"));
-
-                            Directory.SetCurrentDirectory(Path.Combine(tempPath, "TEMP", "DATA", "sys"));
-                            vmc.StartInfo.FileName = "wii-vmc.exe";
-                            vmc.StartInfo.Arguments = "main.dol";
-                            vmc.StartInfo.UseShellExecute = false;
-                            vmc.StartInfo.CreateNoWindow = true;
-                            vmc.StartInfo.RedirectStandardOutput = true;
-                            vmc.StartInfo.RedirectStandardInput = true;
-
-                            vmc.Start();
-                            Thread.Sleep(1000);
-                            vmc.StandardInput.WriteLine("a");
-                            Thread.Sleep(2000);
-                            if (mvm.toPal) vmc.StandardInput.WriteLine("1");
-                            else vmc.StandardInput.WriteLine("2");
-                            Thread.Sleep(2000);
-                            vmc.StandardInput.WriteLine();
-                            vmc.WaitForExit();
-                            File.Delete("wii-vmc.exe");
-
-                            Directory.SetCurrentDirectory(savedir);
-                        }
-
-                    }
-                    //mvm.Msg = "Creating ISO from patched ROM...";
-                    using (Process repack = new Process())
-                    {
-                        if (!mvm.DebugMode)
-                        {
-
-                            repack.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        }
-                        repack.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                        repack.StartInfo.Arguments = $"copy \"{Path.Combine(tempPath, "TEMP")}\" --DEST \"{Path.Combine(tempPath, "game.iso")}\" -ovv --psel WHOLE --iso";
-                        repack.Start();
-                        repack.WaitForExit();
-                        Directory.Delete(Path.Combine(tempPath, "TEMP"), true);
-                        File.Delete(Path.Combine(tempPath, "pre.iso"));
-                    }
+                    // create iso from trimmed rom.
+                    await _isoTool.UseAsync($"copy \"{Path.Combine(tempPath, "TEMP")}\" --DEST \"{Path.Combine(tempPath, "game.iso")}\" -ovv --psel WHOLE --iso");
+                    Directory.Delete(Path.Combine(tempPath, "TEMP"), true);
+                    File.Delete(preIsoPath);
                 }
                 else
                 {
-                    File.Move(Path.Combine(tempPath, "pre.iso"), Path.Combine(tempPath, "game.iso"));
+                    File.Move(preIsoPath, Path.Combine(tempPath, "game.iso"));
                 }
-
             }
 
-            //mvm.Msg = "Replacing TIK and TMD...";
-            using (Process extract = new Process())
-            {
-                if (!mvm.DebugMode)
-                {
-
-                    extract.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                }
-                extract.StartInfo.FileName = Path.Combine(toolsPath, "wit.exe");
-                extract.StartInfo.Arguments = $"extract \"{Path.Combine(tempPath, "game.iso")}\" --psel data --files +tmd.bin --files +ticket.bin --DEST \"{Path.Combine(tempPath, "TIKTMD")}\" -vv1";
-                extract.Start();
-                extract.WaitForExit();
-                foreach (string sFile in Directory.GetFiles(Path.Combine(baseRomPath, "code"), "rvlt.*"))
-                {
-                    File.Delete(sFile);
-                }
-                File.Copy(Path.Combine(tempPath, "TIKTMD", "tmd.bin"), Path.Combine(baseRomPath, "code", "rvlt.tmd"));
-                File.Copy(Path.Combine(tempPath, "TIKTMD", "ticket.bin"), Path.Combine(baseRomPath, "code", "rvlt.tik"));
-                Directory.Delete(Path.Combine(tempPath, "TIKTMD"), true);
-            }
-
-            //mvm.Msg = "Injecting ROM...";
-            foreach (string sFile in Directory.GetFiles(Path.Combine(baseRomPath, "content"), "*.nfs"))
+            // replace TIK and TMD
+            await _isoTool.UseAsync($"extract \"{Path.Combine(tempPath, "game.iso")}\" --psel data --files +tmd.bin --files +ticket.bin --DEST \"{Path.Combine(tempPath, "TIKTMD")}\" -vv1");
+            foreach (string sFile in Directory.GetFiles(Path.Combine(baseRom.Path, "code"), "rvlt.*"))
             {
                 File.Delete(sFile);
             }
-            File.Move(Path.Combine(tempPath, "game.iso"), Path.Combine(baseRomPath, "content", "game.iso"));
-            File.Copy(Path.Combine(toolsPath, "nfs2iso2nfs.exe"), Path.Combine(baseRomPath, "content", "nfs2iso2nfs.exe"));
-            Directory.SetCurrentDirectory(Path.Combine(baseRomPath, "content"));
-            using (Process iso2nfs = new Process())
-            {
-                if (!mvm.DebugMode)
-                {
+            File.Copy(Path.Combine(tempPath, "TIKTMD", "tmd.bin"), Path.Combine(baseRom.Path, "code", "rvlt.tmd"));
+            File.Copy(Path.Combine(tempPath, "TIKTMD", "ticket.bin"), Path.Combine(baseRom.Path, "code", "rvlt.tik"));
+            Directory.Delete(Path.Combine(tempPath, "TIKTMD"), true);
 
-                    iso2nfs.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                }
-                iso2nfs.StartInfo.FileName = "nfs2iso2nfs.exe";
-                string extra = "";
-                if (mvm.Index == 2)
-                {
-                    extra = "-horizontal ";
-                }
-                if (mvm.Index == 3) { extra = "-wiimote "; }
-                if (mvm.Index == 4) { extra = "-instantcc "; }
-                if (mvm.Index == 5) { extra = "-nocc "; }
-                if (mvm.LR) { extra += "-lrpatch "; }
-                iso2nfs.StartInfo.Arguments = $"-enc {extra}-iso game.iso";
-                iso2nfs.Start();
-                iso2nfs.WaitForExit();
-                File.Delete("nfs2iso2nfs.exe");
-                File.Delete("game.iso");
-            }
+            // actually inject
+            foreach (string sFile in Directory.GetFiles(Path.Combine(baseRom.Path, "content"), "*.nfs")) { File.Delete(sFile); }
+            File.Move(Path.Combine(tempPath, "game.iso"), Path.Combine(baseRom.Path, "content", "game.iso"));
+            var nfsIsoTool = _nfsIsoTool.Copy(Path.Combine(baseRom.Path, "content"));
+            Directory.SetCurrentDirectory(Path.Combine(baseRom.Path, "content"));
+            var extra = 
+                config.UseGamepadAs == WiiUseGamePadAs.HorizontalWiiMote ? "-horizontal " :
+                config.UseGamepadAs == WiiUseGamePadAs.VerticalWiiMote ? "-wiimote " :
+                config.UseGamepadAs == WiiUseGamePadAs.ForceClassic ? "-instantcc " :
+                config.UseGamepadAs == WiiUseGamePadAs.ForceNoClassic ? "-nocc" : "";
+            extra += config.LR ? "-lrpatch " : "";
+            await nfsIsoTool.UseAsync($"-enc {extra}-iso game.iso");
+            nfsIsoTool.Delete();
+            File.Delete("game.iso");
+
             Directory.SetCurrentDirectory(savedir);
+        }
+
+        /// <summary>
+        /// Patch with 
+        /// </summary>
+        /// <returns></returns>
+        private async Task PatchForceClassicAsync(string args)
+        {
+            File.WriteAllText("input.txt", "a\n");
+            await _forceClassic.UseAsync(args + " <input.txt");
+            File.Delete("input.txt");
+        }
+
+        /// <summary>
+        /// Patch video with wii-vmc.
+        /// </summary>
+        /// <returns></returns>
+        private async Task PatchVideoAsync(WiiConfig config, string copyWiiVmcToPath)
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+
+            Directory.SetCurrentDirectory(copyWiiVmcToPath);
+            File.WriteAllLines("input.txt", new string[] { "a", config.ToPal ? "1" : "2" });
+            var tool = _wiiVmcTool.Copy(copyWiiVmcToPath);
+            await tool.UseAsync("main.dol <input.txt");
+
+            tool.Delete();
+            File.Delete("input.txt");
+            Directory.SetCurrentDirectory(currentDirectory);
+        }
+        
+        /// <summary>
+        /// Convert a string to hex
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static string ToHex(string input)
+        {
+            var sb = new StringBuilder();
+            foreach (char c in input) sb.AppendFormat("{0:X2}", (int)c);
+            return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Overwrite bytes for region free settings.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="firstBytes"></param>
+        /// <param name="secondBytes"></param>
+        private static void WriteRegionFriiBytes(string path, byte[] firstBytes, byte[] secondBytes)
+        {
+            using (var fs = new FileStream(path, FileMode.Open))
+            {
+                fs.Seek(0x4E003, SeekOrigin.Begin);
+                fs.Write(firstBytes, 0, firstBytes.Length);
+                fs.Seek(0x4E010, SeekOrigin.Begin);
+                fs.Write(secondBytes, 0, secondBytes.Length);
+                fs.Close();
+            }
         }
     }
 }

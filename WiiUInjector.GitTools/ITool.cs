@@ -7,9 +7,13 @@ namespace WiiUInjector.GitTools
     /// </summary>
     internal interface ITool
     {
+        event ToolCompletedEventHandler OnCompletion;
+
         string Name { get; }
         string Location { get; }
-        event ToolCompletedEventHandler OnCompletion;
+
+        void Delete();
+        ITool Copy(string path);
         void Move(string path);
         Task<ToolResponse> UseAsync(string args = null);
     }

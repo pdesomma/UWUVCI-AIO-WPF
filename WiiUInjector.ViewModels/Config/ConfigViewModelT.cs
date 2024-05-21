@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Input;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Messaging;
 using WiiUInjector.Services;
 using WiiUInjector.ViewModels.BootSound;

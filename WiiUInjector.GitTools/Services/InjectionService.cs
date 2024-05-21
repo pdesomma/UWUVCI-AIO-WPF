@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Services;
 
 namespace WiiUInjector.GitTools.Services
@@ -16,6 +16,19 @@ namespace WiiUInjector.GitTools.Services
         /// Creates a new instance of the <see cref="InjectionService"/> class.
         /// </summary>
         public InjectionService() { }
+
+        /// <summary>
+        /// Create an injection for a specific console type.
+        /// </summary>
+        /// <param name="console"></param>
+        /// <param name="baseRom"></param>
+        /// <param name="metadata"></param>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public Task<Injection> InjectAsync(GameConsole console, BaseRom baseRom, Metadata metadata)
+        {
+            throw new System.NotImplementedException();
+        }
 
         /// <summary>
         /// Create a GameBoy injection.

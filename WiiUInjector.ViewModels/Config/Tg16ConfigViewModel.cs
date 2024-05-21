@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Services;
 using WiiUInjector.ViewModels.Commands;
 using WiiUInjector.ViewModels.Services;

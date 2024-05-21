@@ -15,7 +15,7 @@ using UWUVCI_AIO_WPF.ViewModels;
 
 namespace UWUVCI_AIO_WPF.UI.Windows
 {
-    partial class SDSetup : Window, IDisposable
+    partial class SDSetup : Window
     {
         readonly bool gc = false;
         readonly string path = "";
@@ -62,7 +62,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
         private void Checkfornewinput()
         {
             WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2");
-            watcher.EventArrived += new EventArrivedEventHandler(watcher_EventArrived);
+            watcher.EventArrived += new EventArrivedEventHandler(Watcher_EventArrived);
             watcher.Query = query;
             watcher.Options.Timeout = new TimeSpan(0, 0, 5);
             watcher.Start();
@@ -79,7 +79,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
         private void Checkfornewoutput()
         {
             WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 3");
-            watcher2.EventArrived += new EventArrivedEventHandler(watcher_EventArrived);
+            watcher2.EventArrived += new EventArrivedEventHandler(Watcher_EventArrived);
             watcher2.Query = query;
             watcher2.Options.Timeout = new TimeSpan(0, 0, 5);
             watcher2.Start();
@@ -94,7 +94,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
         }
 
-        private void watcher_EventArrived(object sender, EventArrivedEventArgs e)
+        private void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             Dispatcher.Invoke(() => { GetDrives(); });
         }
@@ -104,38 +104,42 @@ namespace UWUVCI_AIO_WPF.UI.Windows
             sd.ItemsSource = DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Removable).Select(d => d.Name + " " + d.VolumeLabel + "").ToList();
         }
 
-        public static long GetDirectorySize(string p)
+        public static long GetDirectorySize(string p, bool? t = null)
         {
-            string[] a = Directory.GetFiles(p, "*.*");
-            long b = 0;
-            foreach (string name in a)
+            if(!t.HasValue)
             {
-                FileInfo info = new FileInfo(name);
-                b += info.Length;
-            }
-            return b;
-        }
-        public static long GetDirectorySize(string b, bool t)
-        {
-            long result = 0;
-            Stack<string> stack = new Stack<string>();
-            stack.Push(b);
-
-            while (stack.Count > 0)
-            {
-                string dir = stack.Pop();
-                try
+                string[] a = Directory.GetFiles(p, "*.*");
+                long b = 0;
+                foreach (string name in a)
                 {
-                    result += GetDirectorySize(dir);
-                    foreach (string dn in Directory.GetDirectories(dir))
-                    {
-                        stack.Push(dn);
-                    }
+                    FileInfo info = new FileInfo(name);
+                    b += info.Length;
                 }
-                catch { }
+                return b;
+            }   
+            else
+            {
+                long result = 0;
+                Stack<string> stack = new Stack<string>();
+                stack.Push(b);
+
+                while (stack.Count > 0)
+                {
+                    string dir = stack.Pop();
+                    try
+                    {
+                        result += GetDirectorySize(dir);
+                        foreach (string dn in Directory.GetDirectories(dir))
+                        {
+                            stack.Push(dn);
+                        }
+                    }
+                    catch { }
+                }
+                return result;
             }
-            return result;
         }
+
         private void Window_Minimize(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
@@ -207,7 +211,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
             return string.Format("{0:0.##} {1}", dblSByte, Suffix[i]);
         }
-        private void setup_Click(object sender, RoutedEventArgs e)
+        private void Setup_Click(object sender, RoutedEventArgs e)
         {
             if (!(FindResource("mvm") as MainViewModel).SaveWorkAround)
             {
@@ -257,24 +261,11 @@ namespace UWUVCI_AIO_WPF.UI.Windows
 
         private void Dp_Tick(object sender, EventArgs e)
         {
-            MainViewModel mvm = DataContext as MainViewModel;
-            status.Content = mvm.Msg;
-            if (mvm.Msg == "Done with Setup!")
-            {
-                mvm.Msg = "";
-                dp.Stop();
-                setup.IsEnabled = true;
-                setup.Click -= setup_Click;
-                setup.Click += Window_Close;
-                setup.Content = "Close";
-            }
         }
 
         private void SetupNintendont()
         {
-            MainViewModel mvm = DataContext as MainViewModel;
-            mvm.Msg = "";
-            mvm.Msg = "Downloading Nintendont...";
+            //mvm.Msg = "Downloading Nintendont...";
             if (Directory.Exists(@"bin\tempsd"))
             {
                 Directory.Delete(@"bin\tempsd", true);
@@ -288,7 +279,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
                 z.ExtractToDirectory(@"bin\tempsd\nintendont");
                 s.Close();
             }
-            mvm.Msg = "Setting up Nintendon't...";
+            //mvm.Msg = "Setting up Nintendon't...";
             if (!File.Exists(driveletter + "\\nincfg.bin"))
 
             {
@@ -314,7 +305,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
         private void CopyInject()
         {
             MainViewModel mvm = DataContext as MainViewModel;
-            mvm.Msg = "Copying Injected Game...";
+            //mvm.Msg = "Copying Injected Game...";
             if (!Path.Combine(path, mvm.foldername).Contains("[WUP]"))
             {
                 DirectoryCopy(Path.Combine(path, mvm.foldername), driveletter + "\\wiiu\\games\\" + mvm.foldername, true);
@@ -325,7 +316,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
             }
 
             mvm.foldername = "";
-            mvm.Msg = "Done with Setup!";
+            //mvm.Msg = "Done with Setup!";
 
         }
 
@@ -361,24 +352,10 @@ namespace UWUVCI_AIO_WPF.UI.Windows
             }
         }
 
-        private void sd_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Sd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (sd.SelectedIndex > -1 && sd.SelectedItem != null)
-            {
-                setup.IsEnabled = true;
-
-            }
-            else
-            {
-                setup.IsEnabled = false;
-
-            }
+            setup.IsEnabled = sd.SelectedIndex > -1 && sd.SelectedItem != null;
             SpecifyDrive();
-        }
-
-        public void Dispose()
-        {
-
         }
     }
 }

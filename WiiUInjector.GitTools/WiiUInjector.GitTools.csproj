@@ -50,6 +50,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configs\Config.cs" />
+    <Compile Include="Configs\GbaConfig.cs" />
+    <Compile Include="Configs\GcConfig.cs" />
+    <Compile Include="Configs\MsxConfig.cs" />
+    <Compile Include="Configs\N64Config.cs" />
+    <Compile Include="Configs\NdsConfig.cs" />
+    <Compile Include="Configs\NesConfig.cs" />
+    <Compile Include="Configs\SnesConfig.cs" />
+    <Compile Include="Configs\Tg16Config.cs" />
+    <Compile Include="Configs\WiiConfig.cs" />
+    <Compile Include="Exceptions\ConfigException.cs" />
+    <Compile Include="Services\IConfigInjectionService.cs" />
+    <Compile Include="WiiUseGamePadAs.cs" />
     <Compile Include="Injectors\WiiInjector.cs" />
     <Compile Include="Services\BaseRomService.cs" />
     <Compile Include="Injectors\GcInjector.cs" />

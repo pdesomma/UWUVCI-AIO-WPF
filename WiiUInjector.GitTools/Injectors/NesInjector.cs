@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 
 namespace WiiUInjector.GitTools
 {

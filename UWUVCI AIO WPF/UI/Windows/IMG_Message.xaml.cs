@@ -165,7 +165,7 @@ namespace UWUVCI_AIO_WPF.UI.Windows
             if (mvm.test == GameConsole.GCN)
             {
                 (mvm.Thing as GCConfig).tvIMG.Visibility = Visibility.Visible;
-                (mvm.Thing as GCConfig).imgpath(Path.Combine(Directory.GetCurrentDirectory(), "bin", "repo", $"iconTex.{ic.Split('.')[3]}"), Path.Combine(Directory.GetCurrentDirectory(), "bin", "repo", $"bootTvTex.{tvs.Split('.')[3]}"));
+                (mvm.Thing as GCConfig).ImgPath(Path.Combine(Directory.GetCurrentDirectory(), "bin", "repo", $"iconTex.{ic.Split('.')[3]}"), Path.Combine(Directory.GetCurrentDirectory(), "bin", "repo", $"bootTvTex.{tvs.Split('.')[3]}"));
 
             }
             else if (mvm.GameConfiguration.Console == GameConsole.WII)

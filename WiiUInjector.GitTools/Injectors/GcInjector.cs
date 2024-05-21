@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 
 namespace WiiUInjector.GitTools
 {
@@ -43,7 +43,7 @@ namespace WiiUInjector.GitTools
                 ToolBox.AddAsync(_nfsTool.Name),
                 ToolBox.AddAsync(_baseTool.Name),
                 ToolBox.AddAsync(_nintendontTool.Name), 
-                ToolBox.AddAsync(_nintendontTool.Name));
+                ToolBox.AddAsync(_nintendontForceTool.Name));
 
             if (Directory.Exists(Path.Combine(s_tempPath, "TempBase"))) Directory.Delete(Path.Combine(s_tempPath, "TempBase"), true);
             Directory.CreateDirectory(Path.Combine(s_tempPath, "TempBase"));

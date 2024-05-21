@@ -1,4 +1,5 @@
-﻿namespace WiiUInjector.Configs
+﻿namespace WiiUInjector.GitTools.
+    Configs
 {
     public sealed class GbaConfig : Config
     {

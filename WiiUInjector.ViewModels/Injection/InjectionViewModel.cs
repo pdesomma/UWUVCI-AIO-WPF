@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Input;
-using WiiUInjector.Configs;
-using WiiUInjector.Services;
 using WiiUInjector.Messaging;
+using WiiUInjector.Services;
 using WiiUInjector.ViewModels.Commands;
 using WiiUInjector.ViewModels.Notifications;
-using System.Threading.Tasks;
 
 namespace WiiUInjector.ViewModels
 {
     public sealed class InjectionViewModel : ViewModel
     {
-        private readonly Config _config;
         private readonly BaseRom _def;
         private readonly Metadata _metadata;
         private readonly IInjectionService _service;
@@ -29,12 +26,14 @@ namespace WiiUInjector.ViewModels
         /// <param name="service"></param>
         /// <param name="commonKeyViewModel"></param>
         /// <param name="exceptionViewModel"></param>
-        public InjectionViewModel(Config config, BaseRom def, IInjectionService service, 
+        public InjectionViewModel(BaseRom def, 
+            Metadata metadata,
+            IInjectionService service, 
             ICommonKeyViewModel commonKeyViewModel,
             BackgroundViewModel backgroundTaskViewModel,
             ExceptionViewModel exceptionViewModel) : base(exceptionViewModel)
         {
-            _config = config;
+            _metadata = metadata;
             _def = def;           
             _service = service;
             _commonKeyViewModel = commonKeyViewModel;
@@ -75,34 +74,7 @@ namespace WiiUInjector.ViewModels
                 Working = true;
                 RaisePropertyChange(nameof(Working));
 
-                Task<Injection> task = null;
-                switch (_config)
-                {
-                    case GbaConfig gbConfig:
-                        task = _service.InjectGameBoyAsync(gbConfig, _def, _metadata, true);
-                        break;
-                    case GcConfig gcConfig:
-                        task = _service.InjectGameCubeAsync(gcConfig, _def, _metadata, true);
-                        break;
-                    case MsxConfig msxConfig:
-                        task = _service.InjectMsxAsync(msxConfig, _def, _metadata, true);
-                        break;
-                    case N64Config n64Config:
-                        task = _service.InjectNintendo64Async(n64Config, _def, _metadata, true);
-                        break;
-                    case NdsConfig ndsConfig:
-                        task = _service.InjectNintendoDsAsync(ndsConfig, _def, _metadata, true);
-                        break;
-                    case NesConfig nesConfig:
-                        task = _service.InjectNesAsync(nesConfig, _def, _metadata, true);
-                        break;
-                    case SnesConfig snesConfig:
-                        task = _service.InjectSuperNintendoAsync(snesConfig, _def, _metadata, true);
-                        break;
-                    case Tg16Config tgConfig:
-                        task = _service.InjectTurboGrafx16Async(tgConfig, _def, _metadata, true);
-                        break;
-                }
+                var task = _service.InjectAsync((GameConsole)parameter, _def, _metadata);
                 _backgroundTaskViewModel.Enqueue(task, "Creating injection");
                 _injection = await task;
 

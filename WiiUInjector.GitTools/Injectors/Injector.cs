@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Exceptions;
 
 namespace WiiUInjector.GitTools

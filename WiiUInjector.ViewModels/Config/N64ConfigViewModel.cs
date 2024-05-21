@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using WiiUInjector;
-using WiiUInjector.Configs;
+using WiiUInjector.GitTools.Configs;
 using WiiUInjector.Services;
 using WiiUInjector.ViewModels.Commands;
 using WiiUInjector.ViewModels.Services;
